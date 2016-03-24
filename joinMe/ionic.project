@@ -1,0 +1,12 @@
+{
+  "name": "joinMe",
+  "app_id": "3294372d",
+  "gulpStartupTasks": [
+    "sass",
+    "watch"
+  ],
+  "watchPatterns": [
+    "www/**/*",
+    "!www/lib/**/*"
+  ]
+}
