@@ -37,7 +37,12 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     templateUrl: 'templates/contact.html',
     controller: 'ContactCtrl'
   });
-  
+  $stateProvider
+  .state('invitation', {
+    url: '/invitation',
+    templateUrl: 'templates/invitation.html',
+    controller: 'InvitationCtrl'
+  });
 
   $urlRouterProvider.otherwise("/");
 
@@ -84,6 +89,10 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
             scaledSize: new google.maps.Size(20, 20)
           }
         });
+
+        $scope.markerLocalisation.addListener('click', function() {
+          $state.go('invitation');
+        });
     });
 
     // start the watcher
@@ -125,5 +134,34 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
   };
 
   $scope.getAllContacts();
+
+})
+
+.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading) {
+  $scope.getAllContacts = function() {
+    $cordovaContacts.find({})
+    .then(function(allContacts) {
+      $scope.contacts = allContacts;
+      console.log(allContacts);
+      var numberEmoji = 25;
+      $scope.objEmojiRaw1 = [];
+      $scope.objEmojiRaw2 = [];
+
+      for(i=1; i<=numberEmoji; i=i+2) {
+        $scope.objEmojiRaw1.push(i+'.png');
+      }
+      for(i=2; i<=numberEmoji; i=i+2) {
+        $scope.objEmojiRaw2.push(i+'.png');
+      }
+    	$ionicLoading.hide();
+    });
+  };
+
+  $ionicLoading.show({
+    template: '<ion-spinner icon="android"/>'
+  });
+
+  $scope.getAllContacts();
+
 
 });

@@ -24,3 +24,38 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 ng-map {
   height: 100%;
 }
+
+.button.joinMeNow {
+  margin: 0;
+  padding:0;
+  font-size: 19px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
+.emoji {
+  overflow: scroll;
+  white-space: nowrap;
+  margin-bottom: 15px;
+  margin-top: 10px;
+}
+
+.eachEmoji {
+  padding: 8px;
+}
+
+.contentInvitation {
+  margin-bottom: 47px;
+}
+
+.selected {
+  background-color: #C1C8C7;
+}
+
+.spinner svg {
+  width: 28px;
+  height: 28px;
+  stroke: #F7F7FA;
+  fill: #3C66EF;
+}
