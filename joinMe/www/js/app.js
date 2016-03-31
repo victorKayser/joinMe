@@ -37,6 +37,7 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     templateUrl: 'templates/contact.html',
     controller: 'ContactCtrl'
   });
+  
 
   $urlRouterProvider.otherwise("/");
 
@@ -114,6 +115,15 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
   });
 })
 
-.controller('ContactCtrl', function($scope, $state) {
+.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform) {
+  $scope.getAllContacts = function() {
+    $cordovaContacts.find({})
+    .then(function(allContacts) {
+      $scope.contacts = allContacts;
+      console.log(allContacts);
+    });
+  };
+
+  $scope.getAllContacts();
 
 });
