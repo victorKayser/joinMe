@@ -30,6 +30,12 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     url: '/',
     templateUrl: 'templates/map.html',
     controller: 'MapCtrl'
+  })
+  $stateProvider
+  .state('contact', {
+    url: '/contact',
+    templateUrl: 'templates/contact.html',
+    controller: 'ContactCtrl'
   });
 
   $urlRouterProvider.otherwise("/");
@@ -40,7 +46,6 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
   NgMap.getMap().then(function(map) {
 
     // check in LS if old position are saved
-    // if yes
     if (window.localStorage['lastPosition']) {
       var lastPosition = JSON.parse(window.localStorage['lastPosition'] || '{}');
       //init the center on the old pos
@@ -87,7 +92,6 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
          enableHighAccuracy: false
      }).then(function () {
          }, function (err) {
-             // you need to enhance that point
 
          }, function (position) {
            // for each new position
@@ -109,3 +113,7 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
      );
   });
 })
+
+.controller('ContactCtrl', function($scope, $state) {
+
+});
