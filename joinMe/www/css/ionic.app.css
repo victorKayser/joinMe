@@ -9760,5 +9760,11 @@ ng-map {
 .spinner svg {
   width: 28px;
   height: 28px;
-  stroke: #999;
-  fill: #999; }
+  stroke: #F7F7FA;
+  fill: #3C66EF; }
+
+.tab-nav.tabs {
+  margin-top: 100px; }
+
+.item-menu {
+  padding-top: 50px; }

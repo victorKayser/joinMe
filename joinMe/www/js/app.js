@@ -12,6 +12,8 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
       // for form inputs)
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
 
+
+
       // Don't remove this line unless you know what you are doing. It stops the viewport
       // from snapping when text inputs are focused. Ionic handles this internally for
       // a much nicer keyboard experience.
@@ -133,35 +135,59 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     });
   };
 
-  $scope.getAllContacts();
+  //$scope.getAllContacts();
 
 })
 
-.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading) {
+.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate) {
+  $ionicSideMenuDelegate.canDragContent(false);
   $scope.getAllContacts = function() {
     $cordovaContacts.find({})
     .then(function(allContacts) {
       $scope.contacts = allContacts;
       console.log(allContacts);
-      var numberEmoji = 25;
-      $scope.objEmojiRaw1 = [];
-      $scope.objEmojiRaw2 = [];
-
-      for(i=1; i<=numberEmoji; i=i+2) {
-        $scope.objEmojiRaw1.push(i+'.png');
-      }
-      for(i=2; i<=numberEmoji; i=i+2) {
-        $scope.objEmojiRaw2.push(i+'.png');
-      }
     	$ionicLoading.hide();
     });
   };
 
-  $ionicLoading.show({
-    template: '<ion-spinner icon="android"/>'
-  });
+  $scope.renderEmoji = function() {
+    var numberEmoji = 25;
+    $scope.objEmojiRaw1 = [];
+    $scope.objEmojiRaw2 = [];
 
-  $scope.getAllContacts();
+    for(i=1; i<=numberEmoji; i=i+2) {
+      $scope.objEmojiRaw1.push(i+'.png');
+    }
+    for(i=2; i<=numberEmoji; i=i+2) {
+      $scope.objEmojiRaw2.push(i+'.png');
+    }
+  };
+  $scope.onSwipeLeft = function () {
+    var selected = $ionicTabsDelegate.selectedIndex();
+    if (selected != -1) {
+        $ionicTabsDelegate.select(selected + 1);
+    }
+  }
 
+  $scope.onSwipeRight = function () {
+    var selected = $ionicTabsDelegate.selectedIndex();
+    if (selected != -1 && selected != 0) {
+        $ionicTabsDelegate.select(selected - 1);
+    }
+  }
+  var isPc = false;
+  // on pc
+  if ((ionic.Platform.platform() === 'linux') || isPc) {
+    console.log('Start on PC : no contacts');
+    $scope.renderEmoji();
+  }
+  // mobile
+  else {
+    $ionicLoading.show({
+      template: '<ion-spinner icon="android"/>'
+    });
+    $scope.renderEmoji();
+    $scope.getAllContacts();
+  }
 
 });

@@ -1,20 +1,38 @@
 <ion-view view-title="Who is coming ?">
   <button class="button button-full button-positive joinMeNow">Join me now !</button>
-  <ion-content padding="true" class="contentInvitation">
-      <h3>For what ?</h3>
-      <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}">
-        <div class="row2">
-          <img ng-repeat="emoji in objEmojiRaw1" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'" src="img/emoji/{{emoji}}" alt="" />
-        </div>
-        <div class="row2">
-          <img ng-repeat="emoji in objEmojiRaw2" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'" src="img/emoji/{{emoji}}" alt="" />
-        </div>
-      </ion-scroll>
-    <div ng-repeat="model in contacts | orderBy:'displayName'">
-      <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null">
-          {{model.displayName}}
-      </ion-checkbox>
-    </div>
+
+  <ion-content class="contentInvitation">
+    <h3>For what ?</h3>
+    <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}">
+      <div class="row2">
+        <img ng-repeat="emoji in objEmojiRaw1" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'" src="img/emoji/{{emoji}}" alt="" />
+      </div>
+      <div class="row2">
+        <img ng-repeat="emoji in objEmojiRaw2" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'" src="img/emoji/{{emoji}}" alt="" />
+      </div>
+    </ion-scroll>
+
+      <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
+        <ion-tab title="Contacts" >
+          <ion-nav-view name="home-tab" class="item-menu">
+            <div ng-repeat="model in contacts | orderBy:'displayName'">
+              <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null">
+                  {{model.displayName}}
+              </ion-checkbox>
+            </div>
+          </ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Groups">
+          <ion-nav-view name="menu-tab" class="item-menu">
+            <h3>No groups.</h3>
+          </ion-nav-view>
+        </ion-tab>
+
+      </ion-tabs>
+
+
+
+
   </ion-content>
 
 </ion-view>
