@@ -1,14 +1,14 @@
 <ion-view view-title="Who is coming ?">
-  <button class="button button-full button-positive joinMeNow">Join me now !</button>
+  <button class="button button-full button-positive joinMeNow" ng-click="validateInvitation()">Join me now !</button>
 
   <ion-content class="contentInvitation">
     <h3>For what ?</h3>
-    <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}">
+    <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}; emojiIsSelected = false;">
       <div class="row2">
-        <img ng-repeat="emoji in objEmojiRaw1" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'" src="img/emoji/{{emoji}}" alt="" />
+        <img ng-repeat="emoji in objEmojiRaw1" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
       </div>
       <div class="row2">
-        <img ng-repeat="emoji in objEmojiRaw2" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'" src="img/emoji/{{emoji}}" alt="" />
+        <img ng-repeat="emoji in objEmojiRaw2" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
       </div>
     </ion-scroll>
 
@@ -16,7 +16,7 @@
         <ion-tab title="Contacts" >
           <ion-nav-view name="home-tab" class="item-menu">
             <div ng-repeat="model in contacts | orderBy:'displayName'">
-              <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null">
+              <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null" ng-model='checkStatus' ng-change='doIfChecked(checkStatus, model.phoneNumbers)'>
                   {{model.displayName}}
               </ion-checkbox>
             </div>

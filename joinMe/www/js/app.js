@@ -131,21 +131,21 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     $cordovaContacts.find({})
     .then(function(allContacts) {
       $scope.contacts = allContacts;
-      console.log(allContacts);
     });
   };
 
-  //$scope.getAllContacts();
+  $scope.getAllContacts();
 
 })
 
-.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate) {
+.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast) {
   $ionicSideMenuDelegate.canDragContent(false);
+
+
   $scope.getAllContacts = function() {
     $cordovaContacts.find({})
     .then(function(allContacts) {
       $scope.contacts = allContacts;
-      console.log(allContacts);
     	$ionicLoading.hide();
     });
   };
@@ -174,6 +174,50 @@ angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     if (selected != -1 && selected != 0) {
         $ionicTabsDelegate.select(selected - 1);
     }
+  }
+  $scope.validateEmoji = function(state, emoji) {
+    $scope.emojiIsValidate = true;
+    $scope.selectedEmoji = emoji;
+  }
+  $scope.validateInvitation = function() {
+    // emoji set
+    if (typeof($scope.emojiIsValidate) !== 'undefined') {
+      if ($scope.invitationToContact.length > 0) {
+
+        $cordovaToast.showShortBottom('Invitation sended...').then(function(success) {
+           $state.go('map');
+         }, function (error) {
+           // error
+         });
+      }
+      else {
+        var alertPopupContacts = $ionicPopup.alert({
+            title: 'Oops!',
+            template: 'Who is coming for <img src="img/emoji/'+$scope.selectedEmoji + '"/> ?'
+        });
+      }
+    }
+    else {
+       var alertPopupEmoji = $ionicPopup.alert({
+           title: 'Warning!',
+           template: 'You have to set an emoji.'
+       });
+    }
+  }
+  $scope.invitationToContact = [];
+  $scope.doIfChecked = function(res, phoneNumber) {
+    // add
+    if (res) {
+      $scope.invitationToContact.push({number: phoneNumber[0].value});
+    }
+    else {
+      angular.forEach($scope.invitationToContact, function(value, key) {
+        if (value.number === phoneNumber[0].value) {
+          $scope.invitationToContact.splice(key, 1);
+        }
+      });
+    }
+
   }
   var isPc = false;
   // on pc
