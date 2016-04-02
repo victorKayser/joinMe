@@ -9805,3 +9805,10 @@ ng-map {
 
 .center {
   text-align: center; }
+
+.imgSideMenu {
+  width: 60px;
+  padding: 8px; }
+
+.nameSideMenu {
+  margin-bottom: 25px; }
