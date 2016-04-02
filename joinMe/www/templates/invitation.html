@@ -12,27 +12,21 @@
       </div>
     </ion-scroll>
 
-      <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
-        <ion-tab title="Contacts" >
-          <ion-nav-view name="home-tab" class="item-menu">
-            <div ng-repeat="model in contacts | orderBy:'displayName'">
-              <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null" ng-model='checkStatus' ng-change='doIfChecked(checkStatus, model.phoneNumbers)'>
-                  {{model.displayName}}
-              </ion-checkbox>
-            </div>
-          </ion-nav-view>
-        </ion-tab>
-        <ion-tab title="Groups">
-          <ion-nav-view name="menu-tab" class="item-menu">
-            <h3>No groups.</h3>
-          </ion-nav-view>
-        </ion-tab>
-
-      </ion-tabs>
-
-
-
-
+    <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
+      <ion-tab title="Contacts" >
+        <ion-nav-view name="home-tab" class="item-menu">
+          <div ng-repeat="model in contacts | orderBy:'displayName'">
+            <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null" ng-model='checkStatus' ng-change='doIfChecked(checkStatus, model.phoneNumbers)'>
+                {{model.displayName}}
+            </ion-checkbox>
+          </div>
+        </ion-nav-view>
+      </ion-tab>
+      <ion-tab title="Groups">
+        <ion-nav-view name="menu-tab" class="item-menu">
+          <h3>No groups.</h3>
+        </ion-nav-view>
+      </ion-tab>
+    </ion-tabs>
   </ion-content>
-
 </ion-view>

@@ -90,11 +90,8 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
     }
   }
 
-  // parameter for pc or mobile
-  var isPc = true;
-
   // on pc
-  if ((ionic.Platform.platform() === 'linux') || isPc) {
+  if ((ionic.Platform.platform() === 'linux') || new Ionic.IO.Settings().get('isPC')) {
     console.log('Start on PC : no contacts');
     $scope.renderEmoji();
   }
