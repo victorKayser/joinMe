@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
+    <meta http-equiv="Content-Security-Policy">
 
     <title></title>
 
@@ -29,6 +29,7 @@
     <script src="controllers/MapCtrl.js"></script>
     <script src="controllers/InvitationCtrl.js"></script>
     <script src="controllers/ContactCtrl.js"></script>
+    <script src="controllers/SettingsCtrl.js"></script>
 
   </head>
   <body ng-app="starter">
@@ -39,12 +40,14 @@
 
             <ion-nav-bar align-title="center" class="bar-positive">
               <ion-nav-back-button>
-                <i class="ion-arrow-left-c"></i> Back
+                <i class="ion-ios-arrow-back"></i>
               </ion-nav-back-button>
               <ion-nav-buttons side="left">
                 <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
               </ion-nav-buttons>
-
+              <ion-nav-buttons side="right">
+                <i class="ion-gear-a" ui-sref="settings"></i>
+              </ion-nav-buttons>
             </ion-nav-bar>
 
             <ion-nav-view>

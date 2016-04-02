@@ -1,5 +1,5 @@
 <ion-view view-title="Who is coming ?">
-  <button class="button button-full button-positive joinMeNow" ng-click="validateInvitation()">Join me now !</button>
+  <button class="button button-full button-positive joinMeNow" ng-click="validateInvitation()"> <i class="ion-paper-airplane"></i> Join me now !</button>
 
   <ion-content class="contentInvitation">
     <h3>For what ?</h3>
@@ -13,7 +13,7 @@
     </ion-scroll>
 
     <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
-      <ion-tab title="Contacts" >
+      <ion-tab icon="ion-ios-person-outline" >
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:'displayName'">
             <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null" ng-model='checkStatus' ng-change='doIfChecked(checkStatus, model.phoneNumbers)'>
@@ -22,7 +22,7 @@
           </div>
         </ion-nav-view>
       </ion-tab>
-      <ion-tab title="Groups">
+      <ion-tab icon="ion-ios-people-outline">
         <ion-nav-view name="menu-tab" class="item-menu">
           <h3>No groups.</h3>
         </ion-nav-view>

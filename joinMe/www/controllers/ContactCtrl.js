@@ -31,7 +31,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
       buttons: [{
          text: 'Cancel'
       }, {
-         text: '<b>Add</b>',
+         text: '<i class="ion-android-done"></i><b> Add</b>',
          type: 'button-positive',
          onTap: function(e) {
            if (typeof($scope.data.group) !== 'undefined') {
@@ -43,6 +43,35 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
            else {
              e.preventDefault();
              $cordovaToast.showShortBottom('Please select a group for ' + contact.displayName)
+             .then(function(success) {
+              }, function (error) {
+              });
+           }
+         }
+      }, ]
+   });
+  }
+  $scope.addNewGroupIndependant = function() {
+    $scope.newGroupData = {};
+    $scope.newGroupIndependant = $ionicPopup.show({
+      templateUrl: 'templates/popupNewGroup.html',
+      title: 'Add a new group',
+      scope: $scope,
+      buttons: [{
+         text: 'Cancel'
+      }, {
+         text: '<i class="ion-android-add"></i><b> Add</b>',
+         type: 'button-positive',
+         onTap: function(e) {
+           if (typeof($scope.newGroupData.newGroupLabel) !== 'undefined') {
+             $cordovaToast.showShortBottom('Group ' + $scope.newGroupData.newGroupLabel + ' added.')
+             .then(function(success) {
+              }, function (error) {
+              });
+           }
+           else {
+             e.preventDefault();
+             $cordovaToast.showShortBottom('Please set the name of the new group.')
              .then(function(success) {
               }, function (error) {
               });
@@ -63,7 +92,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
       buttons: [{
          text: 'Cancel'
       }, {
-         text: '<b>Add</b>',
+         text: '<i class="ion-android-add"></i><b> Add</b>',
          type: 'button-positive',
          onTap: function(e) {
            if (typeof($scope.newGroupData.newGroupLabel) !== 'undefined') {

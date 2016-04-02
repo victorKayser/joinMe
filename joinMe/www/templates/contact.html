@@ -1,7 +1,7 @@
 <ion-view view-title="Contact" class="contact">
   <ion-content>
     <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
-      <ion-tab title="Contacts" >
+      <ion-tab icon="ion-ios-person-outline" >
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:'displayName'">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
@@ -12,9 +12,10 @@
           </div>
         </ion-nav-view>
       </ion-tab>
-      <ion-tab title="Groups">
+      <ion-tab icon="ion-ios-people-outline">
         <ion-nav-view name="menu-tab" class="item-menu">
           <h3>No groups.</h3>
+          <button class="button button-full button-positive newGroupFixed" ng-click="addNewGroupIndependant()"><i class="ion-android-add"></i> New group</button>
         </ion-nav-view>
       </ion-tab>
     </ion-tabs>

@@ -43,6 +43,12 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     templateUrl: 'templates/invitation.html',
     controller: 'InvitationCtrl'
   });
+  $stateProvider
+  .state('settings', {
+    url: '/settings',
+    templateUrl: 'templates/settings.html',
+    controller: 'SettingsCtrl'
+  });
 
   $urlRouterProvider.otherwise("/");
 
