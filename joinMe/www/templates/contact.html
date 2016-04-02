@@ -5,7 +5,7 @@
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:'displayName'">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
-              <ion-item>
+              <ion-item ng-click="showPopup(model)">
                 {{model.displayName}} : {{model.phoneNumbers[0].value}}
               </ion-item>
             </ion-list>

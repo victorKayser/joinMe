@@ -94,6 +94,25 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
   if ((ionic.Platform.platform() === 'linux') || new Ionic.IO.Settings().get('isPC')) {
     console.log('Start on PC : no contacts');
     $scope.renderEmoji();
+    // fictif contact object
+    $scope.contacts = [
+      {
+        displayName: 'Popeye',
+        phoneNumbers: [
+          {
+            value: '0666666666'
+          }
+        ]
+      },
+      {
+        displayName: 'Dom',
+        phoneNumbers: [
+          {
+            value: '0666666667'
+          }
+        ]
+      }
+    ];
   }
   // mobile
   else {
