@@ -9734,6 +9734,9 @@ a.button {
 ng-map {
   height: 100%; }
 
+.container-view {
+  margin-top: 50px; }
+
 .button.joinMeNow {
   margin: 0;
   padding: 0;
