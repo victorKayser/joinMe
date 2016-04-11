@@ -1,4 +1,12 @@
 starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation) {
+  //arrivée sur l'appli
+  var socket = io('http://localhost:5000');
+
+  socket.on('authentification', function() {
+      console.log('ok');
+  });
+
+
   NgMap.getMap().then(function(map) {
 
     // check in LS if old position are saved
