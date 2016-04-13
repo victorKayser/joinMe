@@ -1,9 +1,9 @@
 starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation) {
   //arrivée sur l'appli
-  var socket = io('http://localhost:5000');
+  var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
   socket.on('authentification', function() {
-      console.log('ok');
+      console.log('socket server authentification : OK billy');
   });
 
 
