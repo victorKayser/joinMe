@@ -1,1 +1,1 @@
-{"dev_push":true,"app_id":"656ad69d","api_key":"7d657364bff19a3ca20063eed2617fea957f5516395e6cfb","isPC":false,"serverUrl":"http://localhost:8181","serverSocketUrl":"http://localhost:5000"}
+{"dev_push":true,"app_id":"656ad69d","api_key":"7d657364bff19a3ca20063eed2617fea957f5516395e6cfb","isPC":true,"serverUrl":"http://192.168.0.11:8181","serverSocketUrl":"http://192.168.0.11:5000"}

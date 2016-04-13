@@ -1,4 +1,4 @@
-starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', function($scope, $state, phoneFormatter) {
+starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', '$rootScope', function($scope, $state, phoneFormatter, $rootScope) {
   $scope.dataConnexionForm = {};
 
   $scope.createAccount = function() {
@@ -11,7 +11,6 @@ starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', function($
     if (typeof(phoneNumber) !== 'undefined') {
       // si il est dans le bon format
       if (phoneFormatter.validate(phoneNumber)) {
-        console.log('parfait');
         $state.go('map');
       }
       else {

@@ -1,3 +1,9 @@
-<ion-view view-title="JoinMe">
+<ion-view hide-back-button="true" view-title="JoinMe">
+  <ion-nav-buttons side="left">
+    <button ng-hide="activeTab == 'home'" class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="right">
+    <i ng-hide="activeTab == 'home'" class="ion-gear-a" ui-sref="settings"></i>
+  </ion-nav-buttons>
   <ng-map></ng-map>
 </ion-view>
