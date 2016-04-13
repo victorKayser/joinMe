@@ -1,0 +1,112 @@
+starter.service('auth', function($http) {
+
+        var that = this;
+
+        /**
+         * @member {Boolean} loggedIn true if the user is logged in
+         * <br>
+         */
+        this.loggedIn = false;
+
+        /**
+         * Log the user in
+         * @param {String} username
+         * @param {String} password
+         * @param {Function} callback Called with a boolean (true = auth success)
+         */
+        this.login = function(phoneNumber, password, callback) {
+
+            var that = this;
+
+            callback = callback || function() {};
+
+            $http.post(new Ionic.IO.Settings().get('serverUrl') + '/login',
+            {
+              phoneNumber : phoneNumber,
+              password : password
+            })
+            .then(function successCallback(user) {
+              that.loggedIn = true;
+              that.setUser(user);
+              callback(true);
+            }
+            , function errorCallback(err) {
+              that.loggedIn = false;
+              that.setUser(null);
+              callback(false);
+            });
+        };
+
+        /**
+         * Log the user out
+         * @param {Function} callback Called when the user is logged out (false
+         * is passed in parameter if an error occur)
+         */
+        this.logout = function(callback) {
+
+            var that = this;
+            callback = callback || $.noop;
+
+            api.post('/logout', {
+                success: function() {
+                    that.loggedIn = false;
+                    that.clearUser();
+                    callback(true);
+                },
+                error: function() {
+                    console.error('Logout error.');
+                    callback(false);
+                }
+            });
+        };
+
+        /**
+         * Save the user in the localStorage
+         * @param {object} user User object
+         */
+        this.setUser = function(user) {
+            if (user) {
+                window.localStorage['user'] = JSON.stringify(user);
+            }
+            else {
+                window.localStorage['user'] = null;
+            }
+            this.user = user;
+        };
+
+        /**
+         * Remove the user from the localStorage
+         */
+        this.clearUser = function() {
+            this.setUser(null);
+        };
+
+        /**
+         * Check if the token can authenticate the user
+         * @param {Function} callback A boolean is passed (true = loggedIn)
+         */
+        this.checkLogin = function(callback) {
+            callback = callback || function() {};
+
+            // No authentication without token
+            if (!this.user || !this.user.token) {
+                callback(false);
+                return;
+            }
+
+            api.get('/logged-in', {
+                success: function() {
+                    that.loggedIn = true;
+                    callback(true);
+                },
+                error: function() {
+                    that.loggedIn = false;
+                    callback(false);
+                },
+            });
+        };
+
+        // Load the user from the localStorage
+        var storedUser = localStorage.user;
+        this.setUser(storedUser ? JSON.parse(storedUser) : null);
+});

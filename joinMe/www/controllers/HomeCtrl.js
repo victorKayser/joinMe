@@ -1,17 +1,28 @@
-starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', '$rootScope', function($scope, $state, phoneFormatter, $rootScope) {
+starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', '$rootScope', 'auth', function($scope, $state, phoneFormatter, $rootScope, auth) {
   $scope.dataConnexionForm = {};
 
+  if(JSON.parse(window.localStorage['user']) !== null) {
+    $state.go('map');
+  }
   $scope.createAccount = function() {
     $state.go('registration');
   }
 
   $scope.connect = function(){
     var phoneNumber = $scope.dataConnexionForm.phoneNumber;
+    var password = $scope.dataConnexionForm.password;
     // si le numéro est set
     if (typeof(phoneNumber) !== 'undefined') {
       // si il est dans le bon format
       if (phoneFormatter.validate(phoneNumber)) {
-        $state.go('map');
+        auth.login(phoneNumber, password, function(loginSuccess) {
+          if (loginSuccess) {
+              $state.go('map');
+          }
+          else {
+              console.log('pas ok du tout');
+          }
+        });
       }
       else {
         $scope.dataConnexionForm.phoneNumber = '';
