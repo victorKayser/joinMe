@@ -62,6 +62,6 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     controller: 'RegistrationCtrl'
   });
 
-  $urlRouterProvider.otherwise("/home");
+  $urlRouterProvider.otherwise("/");
 
 })

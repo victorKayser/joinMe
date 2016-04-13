@@ -12,6 +12,7 @@ starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', function($
       // si il est dans le bon format
       if (phoneFormatter.validate(phoneNumber)) {
         console.log('parfait');
+        $state.go('map');
       }
       else {
         $scope.dataConnexionForm.phoneNumber = '';

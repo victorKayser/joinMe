@@ -14,7 +14,7 @@ starter.controller('RegistrationCtrl', function($scope, $state, phoneFormatter) 
         // si le password est set
         if ((typeof(password1) !== 'undefined') && (typeof(password2) !== 'undefined')) {
           if ( (password1.length >= 6) && (password2.length >= 6) ) {
-            console.log('parfait');
+            $state.go('map');
           }
           else {
             $scope.dataRegistration.password1 = '';
