@@ -66,7 +66,7 @@ starter.service('auth', function($http) {
          */
         this.setUser = function(user) {
             if (user) {
-                window.localStorage['user'] = JSON.stringify(user);
+                window.localStorage['user'] = JSON.stringify(user.data);
             }
             else {
                 window.localStorage['user'] = null;
@@ -106,7 +106,7 @@ starter.service('auth', function($http) {
             });
         };
 
-        // Load the user from the localStorage
-        var storedUser = localStorage.user;
-        this.setUser(storedUser ? JSON.parse(storedUser) : null);
+        // // Load the user from the localStorage
+        // var storedUser = window.localStorage['user'];
+        // this.setUser(storedUser ? JSON.parse(storedUser) : null);
 });
