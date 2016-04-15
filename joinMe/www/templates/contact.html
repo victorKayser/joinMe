@@ -24,7 +24,21 @@
       </ion-tab>
       <ion-tab icon="ion-ios-people-outline">
         <ion-nav-view name="menu-tab" class="item-menu">
-          <h3>No groups.</h3>
+          <div ng-repeat="eachGroup in groupObject | unique:'group'">
+            <ion-list>
+              <ion-item>
+                {{eachGroup.group}}
+                <div ng-repeat="contact in groupObject | orderBy:'name'">
+                  <ion-list ng-if="contact.group === eachGroup.group">
+                    <ion-item >
+                      {{contact.name}}
+                    </ion-item>
+                  </ion-list>
+                </div>
+              </ion-item>
+            </ion-list>
+          </div>
+
           <button class="button button-full button-positive newGroupFixed" ng-click="addNewGroupIndependant()"><i class="ion-android-add"></i> New group</button>
         </ion-nav-view>
       </ion-tab>

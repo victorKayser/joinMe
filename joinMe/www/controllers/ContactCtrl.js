@@ -43,31 +43,52 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
   }
   $scope.showPopup = function (contact) {
     $scope.data = {};
-    console.log(contact);
-    $scope.currentContact = contact;
-    $scope.popupContactToGroup = $ionicPopup.show({
-      templateUrl: 'templates/popupContact.html',
-      title: contact.displayName,
-      scope: $scope,
-      buttons: [{
-         text: 'Cancel'
-      }, {
-         text: '<i class="ion-android-done"></i><b> Add</b>',
-         type: 'button-positive',
-         onTap: function(e) {
-           if (typeof($scope.data.group) !== 'undefined') {
-             $cordovaToast.showShortBottom(contact.displayName + ' added to group ' + $scope.data.group);
+    if (contact.isRegistered) {
+      $scope.currentContact = contact;
+      $scope.popupContactToGroup = $ionicPopup.show({
+        templateUrl: 'templates/popupContact.html',
+        title: contact.displayName,
+        scope: $scope,
+        buttons: [{
+           text: 'Cancel'
+        }, {
+           text: '<i class="ion-android-done"></i><b> Add</b>',
+           type: 'button-positive',
+           onTap: function(e) {
+             if (typeof($scope.data.group) !== 'undefined') {
+               $cordovaToast.showShortBottom(contact.displayName + ' added to group ' + $scope.data.group);
+
+               // ajoute la personne dans le groupe
+               if (typeof(window.localStorage['groups']) === 'undefined') {
+                 var groupObject = [];
+               }
+               else {
+                 var groupObject = JSON.parse(window.localStorage['groups']);
+               }
+               groupObject.push({
+                 group : $scope.data.group,
+                 phoneNumber : contact.phoneNumbers[0].value,
+                 name : contact.displayName
+               });
+               window.localStorage['groups'] = JSON.stringify(groupObject);
+
+               $scope.renderGroups();
+             }
+             else {
+               e.preventDefault();
+               $cordovaToast.showShortBottom('Please select a group for ' + contact.displayName)
+               .then(function(success) {
+                }, function (error) {
+                });
+             }
            }
-           else {
-             e.preventDefault();
-             $cordovaToast.showShortBottom('Please select a group for ' + contact.displayName)
-             .then(function(success) {
-              }, function (error) {
-              });
-           }
-         }
-      }, ]
-   });
+        }, ]
+     });
+    }
+    // contact non présent sur l'appli
+    else {
+
+    }
   }
   $scope.addNewGroupIndependant = function() {
     $scope.newGroupData = {};
@@ -131,6 +152,13 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
    });
   }
 
+  $scope.renderGroups = function() {
+    // si la personne a fait des groups de contacts
+    if (typeof(window.localStorage['groups']) !== 'undefined') {
+      $scope.groupObject = JSON.parse(window.localStorage['groups']);
+    }
+  }
+
   // disable swipe on the view
   $ionicSideMenuDelegate.canDragContent(false);
 
@@ -159,12 +187,16 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
         ]
       }
     ];
+    // récupère les contacts
     $scope.checkKnownUsers(contacts, function(err, res) {
       if (!err) {
         $scope.contacts = res;
         $ionicLoading.hide();
       }
     });
+    // affiche les groups avec les contacts dedans
+    $scope.renderGroups();
+
   }
   // mobile
   else {
