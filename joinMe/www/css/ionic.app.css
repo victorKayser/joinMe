@@ -9816,5 +9816,19 @@ ng-map {
 .nameSideMenu {
   margin-bottom: 25px; }
 
+.contactImg {
+  border-radius: 50%;
+  width: 50px; }
+
+.nameContact {
+  display: inline-block;
+  position: absolute;
+  left: 100px;
+  top: 45px; }
+  .nameContact.withoutImg {
+    top: 35px; }
+
 .plusContactIcon {
-  float: right; }
+  position: absolute;
+  right: 25px;
+  top: 35px; }
