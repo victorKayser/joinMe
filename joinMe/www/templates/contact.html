@@ -9,14 +9,14 @@
     <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
       <ion-tab icon="ion-ios-person-outline" >
         <ion-nav-view name="home-tab" class="item-menu">
-          <div ng-repeat="model in contacts | orderBy:'displayName'">
+          <div ng-repeat="model in contacts | orderBy:['-isRegistered','displayName']">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
               <ion-item ng-if="model.isRegistered === true" ng-click="showPopup(model)">
                 {{model.displayName}} : {{model.phoneNumbers[0].value}}
               </ion-item>
               <ion-item ng-if="model.isRegistered !== true" ng-click="showPopup(model)">
                 {{model.displayName}} : {{model.phoneNumbers[0].value}}
-                  <i class="ion-android-add"></i>
+                  <i class="plusContactIcon ion-android-add"></i>
               </ion-item>
             </ion-list>
           </div>
@@ -30,7 +30,7 @@
                 {{eachGroup.group}}
                 <div ng-repeat="contact in groupObject | orderBy:'name'">
                   <ion-list ng-if="contact.group === eachGroup.group">
-                    <ion-item >
+                    <ion-item ng-if="contact.name !== ''">
                       {{contact.name}}
                     </ion-item>
                   </ion-list>

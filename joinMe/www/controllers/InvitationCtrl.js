@@ -1,15 +1,47 @@
 
-starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast) {
+starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http) {
   // disable swipe on the view
   $ionicSideMenuDelegate.canDragContent(false);
   // get all contacts
   $scope.getAllContacts = function() {
     $cordovaContacts.find({})
     .then(function(allContacts) {
-      $scope.contacts = allContacts;
-    	$ionicLoading.hide();
+      $scope.checkKnownUsers(allContacts, function(err, res) {
+        if (!err) {
+          $scope.contacts = res;
+          $ionicLoading.hide();
+          $scope.renderGroups();
+        }
+      });
     });
   };
+
+  $scope.checkKnownUsers = function (contacts, done) {
+    var filterContact = [];
+    contacts.map(function(contact) {
+      if ((contact.displayName !== '') && (contact.phoneNumbers !== null)) {
+        filterContact.push(contact);
+      }
+    })
+    $http.post(new Ionic.IO.Settings().get('serverUrl') + '/checkKnownUsers',
+    {
+      contacts : filterContact,
+    })
+    .then(function successCallback(contactsChecked) {
+      done(null, contactsChecked.data);
+    }
+    , function errorCallback(err) {
+      done(err);
+    });
+  }
+
+  $scope.renderGroups = function() {
+    // si la personne a fait des groups de contacts
+    if (typeof(window.localStorage['groups']) !== 'undefined') {
+      $scope.groupObject = JSON.parse(window.localStorage['groups']);
+    }
+  }
+
   // render 2 objets (number.png) for two rows of emoji
   $scope.renderEmoji = function() {
     var numberEmoji = 25;
