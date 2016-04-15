@@ -133,7 +133,7 @@ starter.controller('SettingsCtrl', function($scope, $state, NgMap, $cordovaGeolo
   var user = JSON.parse(window.localStorage['user']);
   if (user.image_path !== "") {
     var image = document.getElementById('profil-picture');
-    image.src = new Ionic.IO.Settings().get('serverUploadDirectory') + uniqFileName + '.jpeg';
+    image.src = new Ionic.IO.Settings().get('serverUploadDirectory') + user.image_path;
     if (image.width > image.height) {
       image.style.removeProperty('width');
       image.style.height = "100%";
