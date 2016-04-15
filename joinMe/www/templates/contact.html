@@ -11,8 +11,12 @@
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:'displayName'">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
-              <ion-item ng-click="showPopup(model)">
+              <ion-item ng-if="model.isRegistered === true" ng-click="showPopup(model)">
                 {{model.displayName}} : {{model.phoneNumbers[0].value}}
+              </ion-item>
+              <ion-item ng-if="model.isRegistered !== true" ng-click="showPopup(model)">
+                {{model.displayName}} : {{model.phoneNumbers[0].value}}
+                  <i class="ion-android-add"></i>
               </ion-item>
             </ion-list>
           </div>

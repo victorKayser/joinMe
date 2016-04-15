@@ -1,11 +1,31 @@
-starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast) {
+starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http) {
   $scope.getAllContacts = function() {
     $cordovaContacts.find({})
+    // obtient tous les contact du téléphone
     .then(function(allContacts) {
-      $scope.contacts = allContacts;
-      $ionicLoading.hide();
+      // maintenant on cherche à savoir qui parmi mes contact est inscrit sur l'appli
+      $scope.checkKnownUsers(allContacts, function(err, res) {
+        if (!err) {
+          $scope.contacts = res;
+          $ionicLoading.hide();
+        }
+      });
     });
   };
+
+  $scope.checkKnownUsers = function (contacts, done) {
+
+    $http.post(new Ionic.IO.Settings().get('serverUrl') + '/checkKnownUsers',
+    {
+      contacts : contacts,
+    })
+    .then(function successCallback(contactsChecked) {
+      done(null, contactsChecked.data);
+    }
+    , function errorCallback(err) {
+      done(err);
+    });
+  }
 
   // event on the left swipe in the tabs
   $scope.onSwipeLeft = function () {
@@ -23,6 +43,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
   }
   $scope.showPopup = function (contact) {
     $scope.data = {};
+    console.log(contact);
     $scope.currentContact = contact;
     $scope.popupContactToGroup = $ionicPopup.show({
       templateUrl: 'templates/popupContact.html',
@@ -35,10 +56,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
          type: 'button-positive',
          onTap: function(e) {
            if (typeof($scope.data.group) !== 'undefined') {
-             $cordovaToast.showShortBottom(contact.displayName + ' added to group ' + $scope.data.group)
-             .then(function(success) {
-              }, function (error) {
-              });
+             $cordovaToast.showShortBottom(contact.displayName + ' added to group ' + $scope.data.group);
            }
            else {
              e.preventDefault();
@@ -119,8 +137,11 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
   // on pc
   if ((ionic.Platform.platform() === 'linux') || new Ionic.IO.Settings().get('isPC')) {
     console.log('Start on PC : no contacts');
+    $cordovaToast.showShortBottom = function(text) {
+      console.log(text);
+    }
     // fictif contact object
-    $scope.contacts = [
+    var contacts = [
       {
         displayName: 'Popeye',
         phoneNumbers: [
@@ -138,6 +159,12 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
         ]
       }
     ];
+    $scope.checkKnownUsers(contacts, function(err, res) {
+      if (!err) {
+        $scope.contacts = res;
+        $ionicLoading.hide();
+      }
+    });
   }
   // mobile
   else {
