@@ -93,7 +93,16 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
     }
     // contact non présent sur l'appli
     else {
+      var confirmPopup = $ionicPopup.confirm({
+        title: contact.displayName + ' doesn\'n have JoinMe',
+        template: 'Send an invitation ?'
+      });
 
+      confirmPopup.then(function(res) {
+        if(res) {
+        } else {
+        }
+      });
     }
   }
   $scope.addNewGroupIndependant = function() {
@@ -110,9 +119,22 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
          onTap: function(e) {
            if (typeof($scope.newGroupData.newGroupLabel) !== 'undefined') {
              $cordovaToast.showShortBottom('Group ' + $scope.newGroupData.newGroupLabel + ' added.')
-             .then(function(success) {
-              }, function (error) {
-              });
+             //ajoute le nouveau group et la personne dedans
+             // ajoute la personne dans le groupe
+             if (typeof(window.localStorage['groups']) === 'undefined') {
+               var groupObject = [];
+             }
+             else {
+               var groupObject = JSON.parse(window.localStorage['groups']);
+             }
+             groupObject.push({
+               group : $scope.newGroupData.newGroupLabel,
+               phoneNumber : '',
+               name : ''
+             });
+             window.localStorage['groups'] = JSON.stringify(groupObject);
+
+             $scope.renderGroups();
            }
            else {
              e.preventDefault();
