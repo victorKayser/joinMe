@@ -65,20 +65,10 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
                $cordovaToast.showShortBottom(contact.displayName + ' added to group ' + $scope.data.group);
 
                // ajoute la personne dans le groupe
-               if (typeof(window.localStorage['groups']) === 'undefined') {
-                 var groupObject = [];
-               }
-               else {
-                 var groupObject = JSON.parse(window.localStorage['groups']);
-               }
-               groupObject.push({
-                 group : $scope.data.group,
-                 phoneNumber : contact.phoneNumbers[0].value,
-                 name : contact.displayName
+               $scope.addContactInGroup($scope.data.group, contact, function(){
+                 $scope.renderGroups();
                });
-               window.localStorage['groups'] = JSON.stringify(groupObject);
 
-               $scope.renderGroups();
              }
              else {
                e.preventDefault();
@@ -119,22 +109,10 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
          onTap: function(e) {
            if (typeof($scope.newGroupData.newGroupLabel) !== 'undefined') {
              $cordovaToast.showShortBottom('Group ' + $scope.newGroupData.newGroupLabel + ' added.')
-             //ajoute le nouveau group et la personne dedans
-             // ajoute la personne dans le groupe
-             if (typeof(window.localStorage['groups']) === 'undefined') {
-               var groupObject = [];
-             }
-             else {
-               var groupObject = JSON.parse(window.localStorage['groups']);
-             }
-             groupObject.push({
-               group : $scope.newGroupData.newGroupLabel,
-               phoneNumber : '',
-               name : ''
+             //ajoute le nouveau group
+             $scope.addContactInGroup($scope.newGroupData.newGroupLabel, null, function(){
+               $scope.renderGroups();
              });
-             window.localStorage['groups'] = JSON.stringify(groupObject);
-
-             $scope.renderGroups();
            }
            else {
              e.preventDefault();
@@ -167,20 +145,9 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
 
              //ajoute le nouveau group et la personne dedans
              // ajoute la personne dans le groupe
-             if (typeof(window.localStorage['groups']) === 'undefined') {
-               var groupObject = [];
-             }
-             else {
-               var groupObject = JSON.parse(window.localStorage['groups']);
-             }
-             groupObject.push({
-               group : $scope.newGroupData.newGroupLabel,
-               phoneNumber : $scope.currentContact.phoneNumbers[0].value,
-               name : $scope.currentContact.displayName
+             $scope.addContactInGroup($scope.newGroupData.newGroupLabel, $scope.currentContact, function(){
+               $scope.renderGroups();
              });
-             window.localStorage['groups'] = JSON.stringify(groupObject);
-
-             $scope.renderGroups();
            }
            else {
              e.preventDefault();
@@ -199,6 +166,32 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
     if (typeof(window.localStorage['groups']) !== 'undefined') {
       $scope.groupObject = JSON.parse(window.localStorage['groups']);
     }
+  }
+
+  $scope.addContactInGroup = function(group, contact, done) {
+    if (typeof(window.localStorage['groups']) === 'undefined') {
+      var groupObject = [];
+    }
+    else {
+      var groupObject = JSON.parse(window.localStorage['groups']);
+    }
+    if (!contact) {
+      groupObject.push({
+        group : group,
+        phoneNumber : '',
+        name : ''
+      });
+    }
+    else {
+      groupObject.push({
+        group : group,
+        phoneNumber : contact.phoneNumbers[0].value,
+        name : contact.displayName
+      });
+    }
+
+    window.localStorage['groups'] = JSON.stringify(groupObject);
+    done();
   }
 
   // disable swipe on the view
