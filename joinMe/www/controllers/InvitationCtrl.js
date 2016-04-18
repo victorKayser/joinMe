@@ -143,10 +143,11 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
   }
   // SOUPE ! sélectionne les contact sur l'onglet contact en fonction du group sélectionné
   $scope.selectContactFromGroup = function(group, checked) {
+
+    // ajoute/enleve une classe selected a chaque contact du group
+    angular.element(document.querySelectorAll('.'+group)).toggleClass('selected');
     // boucle sur les contacts appartenant au groupe checké
     angular.forEach(angular.element(document.querySelectorAll('.'+group)), function(contactInGroup, key){
-      // ajoute/enleve une classe selected a chaque contact du group
-      angular.element(contactInGroup).toggleClass('selected');
       // boucle sur tous les contacts seuls (onglet contact, pas groupe)
       angular.forEach(angular.element(document.querySelectorAll('.aloneContact')), function(contactAlone, key2){
         //récupère le nom du contact du groupe
@@ -167,17 +168,20 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
           }
           //décheck un group
           else {
+            var inside = false;
             if(document.querySelectorAll('.htmlContactInGroup.selected').length > 0) {
               // pour chaque contact ayant la classe selected
               angular.forEach(angular.element(document.querySelectorAll('.htmlContactInGroup.selected')), function(value, key3){
                 // si dans le groupe que je décoche un contact est coché ailleurs
-                // si c'est pas le cas, alors je peux le décocher sur la vue contact seule
-                if (angular.element(value).attr('phone') !== numberAloneContact) {
-                  angular.element(checkbox).prop('checked', false);
+                if (angular.element(value).attr('phone') === numberAloneContact) {
+                  inside = true;
                 }
               });
             }
             else {
+              angular.element(checkbox).prop('checked', false);
+            }
+            if (!inside) {
               angular.element(checkbox).prop('checked', false);
             }
           }
