@@ -38,7 +38,7 @@
                 <div ng-repeat="contact in groupObject | orderBy:'name'">
                   <ion-list ng-if="contact.group === eachGroup.group">
                     <ion-item ng-if="contact.name !== ''">
-                      {{contact.name}}
+                      {{contact.name}} <i ng-click="deleteContactFromGroup(eachGroup.group, contact.phoneNumber)" class="icon-right ion-close"></i>
                     </ion-item>
                   </ion-list>
                 </div>

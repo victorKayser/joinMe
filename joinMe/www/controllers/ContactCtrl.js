@@ -178,6 +178,17 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
     }
   }
 
+  $scope.deleteContactFromGroup = function(group, number) {
+    var groupObject = JSON.parse(window.localStorage['groups']);
+    groupObject.map(function(eachGroupObject, key){
+      if((eachGroupObject.group === group) && (eachGroupObject.phoneNumber === number)) {
+        groupObject.splice(key, 1);
+      }
+    });
+    window.localStorage['groups'] = JSON.stringify(groupObject);
+    $scope.renderGroups();
+  }
+
   $scope.addContactInGroup = function(group, contact, done) {
     if (typeof(window.localStorage['groups']) === 'undefined') {
       var groupObject = [];
