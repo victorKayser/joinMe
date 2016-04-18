@@ -62,11 +62,15 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
            type: 'button-positive',
            onTap: function(e) {
              if (typeof($scope.data.group) !== 'undefined') {
-               $cordovaToast.showShortBottom(contact.displayName + ' added to group ' + $scope.data.group);
-
                // ajoute la personne dans le groupe
-               $scope.addContactInGroup($scope.data.group, contact, function(){
-                 $scope.renderGroups();
+               $scope.addContactInGroup($scope.data.group, contact, function(err, res){
+                 if (!err) {
+                   $scope.renderGroups();
+                   $cordovaToast.showShortBottom(contact.displayName + ' added to group ' + $scope.data.group);
+                 }
+                 else {
+                   $cordovaToast.showShortBottom(contact.displayName + ' already in the group ' + $scope.data.group);
+                 }
                });
 
              }
@@ -141,12 +145,18 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
          type: 'button-positive',
          onTap: function(e) {
            if (typeof($scope.newGroupData.newGroupLabel) !== 'undefined') {
-             $cordovaToast.showShortBottom($scope.currentContact.displayName + ' added to new group ' + $scope.newGroupData.newGroupLabel)
+
 
              //ajoute le nouveau group et la personne dedans
              // ajoute la personne dans le groupe
-             $scope.addContactInGroup($scope.newGroupData.newGroupLabel, $scope.currentContact, function(){
-               $scope.renderGroups();
+             $scope.addContactInGroup($scope.newGroupData.newGroupLabel, $scope.currentContact, function(err, res){
+               if (!err) {
+                 $scope.renderGroups();
+                 $cordovaToast.showShortBottom($scope.currentContact.displayName + ' added to new group ' + $scope.newGroupData.newGroupLabel);
+               }
+               else {
+                 $cordovaToast.showShortBottom($scope.currentContact.displayName + ' already in the group ' + $scope.newGroupData.newGroupLabel);
+               }
              });
            }
            else {
@@ -175,23 +185,37 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
     else {
       var groupObject = JSON.parse(window.localStorage['groups']);
     }
+    // pour l'ajout d'un group indépendemment
     if (!contact) {
       groupObject.push({
         group : group,
         phoneNumber : '',
         name : ''
       });
+      window.localStorage['groups'] = JSON.stringify(groupObject);
+      done();
     }
     else {
-      groupObject.push({
-        group : group,
-        phoneNumber : contact.phoneNumbers[0].value,
-        name : contact.displayName
+      var isInGroup = false;
+      groupObject.map(function(eachGroupObject, key){
+        // contact already in this group
+        if ((eachGroupObject.group === group) && (eachGroupObject.phoneNumber === contact.phoneNumbers[0].value)) {
+          isInGroup = true;
+        }
       });
+      if (!isInGroup) {
+        groupObject.push({
+          group : group,
+          phoneNumber : contact.phoneNumbers[0].value,
+          name : contact.displayName
+        });
+        window.localStorage['groups'] = JSON.stringify(groupObject);
+        done();
+      }
+      else {
+        done('error');
+      }
     }
-
-    window.localStorage['groups'] = JSON.stringify(groupObject);
-    done();
   }
 
   // disable swipe on the view
