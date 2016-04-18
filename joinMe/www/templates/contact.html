@@ -11,18 +11,18 @@
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:['-isRegistered','displayName']">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
-              <ion-item ng-if="model.isRegistered === true" ng-click="showPopup(model)">
+              <ion-item class="itemContact" ng-if="model.isRegistered === true" ng-click="showPopup(model)">
                 <div ng-if="model.image_path.indexOf('.jpeg') > -1">
                   <img src="{{model.image_path}}" class="contactImg" alt="" />
                 </div>
                 <div ng-if="model.image_path.indexOf('.jpeg') === -1">
-                  <img src="img/ionic.png" class="contactImg withoutImg" alt="" />
+                  <img src="img/ionic.png" class="contactImg" alt="" />
                 </div>
                 <div class="nameContact">{{model.displayName}}</div>
               </ion-item>
-              <ion-item ng-if="model.isRegistered !== true" ng-click="showPopup(model)">
-                <img src="img/ionic.png" class="contactImg withoutImg" alt="" />
-                <div class="nameContact withoutImg">{{model.displayName}}</div>
+              <ion-item class="itemContact" ng-if="model.isRegistered !== true" ng-click="showPopup(model)">
+                <img src="img/ionic.png" class="contactImg" alt="" />
+                <div class="nameContact">{{model.displayName}}</div>
                 <i class="plusContactIcon ion-android-add"></i>
               </ion-item>
             </ion-list>
@@ -34,7 +34,9 @@
           <div ng-repeat="eachGroup in groupObject | unique:'group'">
             <ion-list>
               <ion-item>
-                {{eachGroup.group}}
+                <div class="itemGroupContact">
+                  {{eachGroup.group}} <i ng-click="" class="icon-right ion-android-more-horizontal"></i>
+                </div>
                 <div ng-repeat="contact in groupObject | orderBy:'name'">
                   <ion-list ng-if="contact.group === eachGroup.group">
                     <ion-item ng-if="contact.name !== ''">
@@ -45,8 +47,6 @@
               </ion-item>
             </ion-list>
           </div>
-
-          <button class="button button-full button-positive newGroupFixed" ng-click="addNewGroupIndependant()"><i class="ion-android-add"></i> New group</button>
         </ion-nav-view>
       </ion-tab>
     </ion-tabs>

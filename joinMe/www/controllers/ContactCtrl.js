@@ -99,36 +99,6 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
       });
     }
   }
-  $scope.addNewGroupIndependant = function() {
-    $scope.newGroupData = {};
-    $scope.newGroupIndependant = $ionicPopup.show({
-      templateUrl: 'templates/popupNewGroup.html',
-      title: 'Add a new group',
-      scope: $scope,
-      buttons: [{
-         text: 'Cancel'
-      }, {
-         text: '<i class="ion-android-add"></i><b> Add</b>',
-         type: 'button-positive',
-         onTap: function(e) {
-           if (typeof($scope.newGroupData.newGroupLabel) !== 'undefined') {
-             $cordovaToast.showShortBottom('Group ' + $scope.newGroupData.newGroupLabel + ' added.')
-             //ajoute le nouveau group
-             $scope.addContactInGroup($scope.newGroupData.newGroupLabel, null, function(){
-               $scope.renderGroups();
-             });
-           }
-           else {
-             e.preventDefault();
-             $cordovaToast.showShortBottom('Please set the name of the new group.')
-             .then(function(success) {
-              }, function (error) {
-              });
-           }
-         }
-      }, ]
-   });
-  }
 
   $scope.addNewGroup = function () {
     $scope.newGroupData = {};
@@ -186,6 +156,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
       }
     });
     window.localStorage['groups'] = JSON.stringify(groupObject);
+    $cordovaToast.showShortBottom('Contact deleted from group ' + group);
     $scope.renderGroups();
   }
 
@@ -196,36 +167,24 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
     else {
       var groupObject = JSON.parse(window.localStorage['groups']);
     }
-    // pour l'ajout d'un group indépendemment
-    if (!contact) {
+    var isInGroup = false;
+    groupObject.map(function(eachGroupObject, key){
+      // contact already in this group
+      if ((eachGroupObject.group === group) && (eachGroupObject.phoneNumber === contact.phoneNumbers[0].value)) {
+        isInGroup = true;
+      }
+    });
+    if (!isInGroup) {
       groupObject.push({
         group : group,
-        phoneNumber : '',
-        name : ''
+        phoneNumber : contact.phoneNumbers[0].value,
+        name : contact.displayName
       });
       window.localStorage['groups'] = JSON.stringify(groupObject);
       done();
     }
     else {
-      var isInGroup = false;
-      groupObject.map(function(eachGroupObject, key){
-        // contact already in this group
-        if ((eachGroupObject.group === group) && (eachGroupObject.phoneNumber === contact.phoneNumbers[0].value)) {
-          isInGroup = true;
-        }
-      });
-      if (!isInGroup) {
-        groupObject.push({
-          group : group,
-          phoneNumber : contact.phoneNumbers[0].value,
-          name : contact.displayName
-        });
-        window.localStorage['groups'] = JSON.stringify(groupObject);
-        done();
-      }
-      else {
-        done('error');
-      }
+      done('error');
     }
   }
 

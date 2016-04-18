@@ -123,21 +123,16 @@ ng-map {
   margin-bottom: 25px;
 }
 
-
-
 .contactImg {
   border-radius: 50%;
-  width: 50px;
+  height: 50px;
 }
 
 .nameContact {
   display: inline-block;
   position: absolute;
     left: 100px;
-    top:45px;
-  &.withoutImg {
-    top: 35px;
-  }
+    top:28px;
 }
 .plusContactIcon {
   position: absolute;
@@ -148,6 +143,20 @@ ng-map {
 .itemGroup {
   font-weight: bold;
   font-size: 20px;
+}
+.itemGroupContact {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 8px;
+
+  .icon-right {
+    margin-right: 17px;
+  }
+}
+
+.itemContact {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .icon-right {
