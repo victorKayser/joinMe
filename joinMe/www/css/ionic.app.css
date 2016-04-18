@@ -9832,3 +9832,7 @@ ng-map {
   position: absolute;
   right: 25px;
   top: 35px; }
+
+.itemGroup {
+  font-weight: bold;
+  font-size: 20px; }

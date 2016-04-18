@@ -16,7 +16,7 @@
       <ion-tab icon="ion-ios-person-outline" >
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:'displayName'">
-            <ion-checkbox ng-if="model.displayName !== '' && model.phoneNumbers !== null && model.isRegistered === true" ng-model='checkStatus' ng-change='doIfChecked(checkStatus, model.phoneNumbers)'>
+            <ion-checkbox id="{{model.phoneNumbers}}" class="aloneContact" ng-if="model.displayName !== '' && model.phoneNumbers !== null && model.isRegistered === true" ng-model='checkStatus' ng-click='doIfChecked(checkStatus, model.phoneNumbers[0].value)'>
                 {{model.displayName}}
             </ion-checkbox>
           </div>
@@ -25,18 +25,16 @@
       <ion-tab icon="ion-ios-people-outline">
         <ion-nav-view name="menu-tab" class="item-menu">
           <div ng-repeat="eachGroup in groupObject | unique:'group'">
-            <ion-list>
-              <ion-item>
+            <ion-checkbox class="group" ng-model='groupState' ng-click='selectContactFromGroup(eachGroup.group, groupState)'>
+              <div class="itemGroup">
                 {{eachGroup.group}}
-                <div ng-repeat="contact in groupObject | orderBy:'name'">
-                  <ion-list ng-if="contact.group === eachGroup.group">
-                    <ion-item >
-                      {{contact.name}}
-                    </ion-item>
-                  </ion-list>
+              </div>
+              <div ng-repeat="contact in groupObject | orderBy:'name'">
+                <div class='{{eachGroup.group}} htmlContactInGroup' phone="{{contact.phoneNumber}}" ng-if="contact.group === eachGroup.group && contact.name !== ''">
+                  {{contact.name}}
                 </div>
-              </ion-item>
-            </ion-list>
+              </div>
+            </ion-checkbox>
           </div>
         </ion-nav-view>
       </ion-tab>

@@ -12,7 +12,12 @@
           <div ng-repeat="model in contacts | orderBy:['-isRegistered','displayName']">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
               <ion-item ng-if="model.isRegistered === true" ng-click="showPopup(model)">
-                <img src="{{model.image_path}}" class="contactImg" alt="" />
+                <div ng-if="model.image_path.indexOf('.jpeg') > -1">
+                  <img src="{{model.image_path}}" class="contactImg" alt="" />
+                </div>
+                <div ng-if="model.image_path.indexOf('.jpeg') === -1">
+                  <img src="img/ionic.png" class="contactImg withoutImg" alt="" />
+                </div>
                 <div class="nameContact">{{model.displayName}}</div>
               </ion-item>
               <ion-item ng-if="model.isRegistered !== true" ng-click="showPopup(model)">

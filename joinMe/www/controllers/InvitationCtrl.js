@@ -107,27 +107,94 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
   // objetc which contains all contact for the invitation
   $scope.invitationToContact = [];
 
+  // incrémente l'objet qui contient les contacts pour l'invitation
   $scope.doIfChecked = function(res, phoneNumber) {
-    // add contact (number)
+    // coche la case : add contact (number)
     if (res) {
-      $scope.invitationToContact.push({number: phoneNumber[0].value});
+      //s'il y a du monde
+        if (typeof $scope.invitationToContact !== 'undefined' && $scope.invitationToContact.length > 0) {
+          // on boucle sur les gens dedans
+          var notInsideObject = true;
+          angular.forEach($scope.invitationToContact, function(value, key) {
+            if (value.number === phoneNumber) {
+              notInsideObject = false;
+            }
+          });
+          // et seulement si la personne n'est pas dedans, on l'ajoute
+          if (notInsideObject) {
+            $scope.invitationToContact.push({number: phoneNumber});
+          }
+        }
+        //sinon personne dedans, on ajoute la personne à l'objet
+        else {
+          $scope.invitationToContact.push({number: phoneNumber});
+        }
     }
-    // remove contact of the object
+    // décoche : remove contact of the object
     else {
+      // on boucle sur les gens
       angular.forEach($scope.invitationToContact, function(value, key) {
-        if (value.number === phoneNumber[0].value) {
+        // puis on supprime la personne
+        if (value.number === phoneNumber) {
           $scope.invitationToContact.splice(key, 1);
         }
       });
     }
   }
+  // SOUPE ! sélectionne les contact sur l'onglet contact en fonction du group sélectionné
+  $scope.selectContactFromGroup = function(group, checked) {
+    // boucle sur les contacts appartenant au groupe checké
+    angular.forEach(angular.element(document.querySelectorAll('.'+group)), function(contactInGroup, key){
+      // ajoute/enleve une classe selected a chaque contact du group
+      angular.element(contactInGroup).toggleClass('selected');
+      // boucle sur tous les contacts seuls (onglet contact, pas groupe)
+      angular.forEach(angular.element(document.querySelectorAll('.aloneContact')), function(contactAlone, key2){
+        //récupère le nom du contact du groupe
+        var eachContactIngroupFormated = angular.element(contactInGroup).text().replace(/\s/g, '');
+        // récupère le nom du contact indépendant (onglet contact)
+        var eachContactAloneFormated = angular.element(contactAlone).text().replace(/\s/g, '');
+        // récupère le numéro de téléphone du contact indépendant
+        var numberAloneContact = JSON.parse(angular.element(contactAlone).attr('id'))[0].value;
+        // pour chaque personne du groupe
+        if (eachContactIngroupFormated === eachContactAloneFormated) {
+          // on récupère l'élément html correpondant au checkbox de la personne indépendante
+          var divCheckbox = angular.element(contactAlone).children()[0];
+          var checkbox = angular.element(divCheckbox).children()[0];
+          // check un group
+          if (checked) {
+            // check la personne concernée dans la liste des contacts
+            angular.element(checkbox).prop('checked', true);
+          }
+          //décheck un group
+          else {
+            if(document.querySelectorAll('.htmlContactInGroup.selected').length > 0) {
+              // pour chaque contact ayant la classe selected
+              angular.forEach(angular.element(document.querySelectorAll('.htmlContactInGroup.selected')), function(value, key3){
+                // si dans le groupe que je décoche un contact est coché ailleurs
+                // si c'est pas le cas, alors je peux le décocher sur la vue contact seule
+                if (angular.element(value).attr('phone') !== numberAloneContact) {
+                  angular.element(checkbox).prop('checked', false);
+                }
+              });
+            }
+            else {
+              angular.element(checkbox).prop('checked', false);
+            }
+          }
+          // ajoute ou supprime le contact dans l'objet des invitation
+          $scope.doIfChecked(checked, numberAloneContact);
+        }
+      })
+    })
+  }
+
 
   // on pc
   if ((ionic.Platform.platform() === 'linux') || new Ionic.IO.Settings().get('isPC')) {
     console.log('Start on PC : no contacts');
     $scope.renderEmoji();
     // fictif contact object
-    $scope.contacts = [
+    var contacts = [
       {
         displayName: 'Popeye',
         phoneNumbers: [
@@ -145,6 +212,13 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
         ]
       }
     ];
+    $scope.checkKnownUsers(contacts, function(err, res) {
+      if (!err) {
+        $scope.contacts = res;
+        $ionicLoading.hide();
+        $scope.renderGroups();
+      }
+    });
   }
   // mobile
   else {
