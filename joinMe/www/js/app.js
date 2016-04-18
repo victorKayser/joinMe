@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $state) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -19,6 +19,12 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     }
     if(window.StatusBar) {
       StatusBar.styleDefault();
+    }
+
+    if (window.localStorage['user']) {
+      if(JSON.parse(window.localStorage['user']) !== null) {
+        $state.go('map');
+      }
     }
   });
 })

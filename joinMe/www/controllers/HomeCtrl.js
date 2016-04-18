@@ -1,11 +1,11 @@
 starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', '$rootScope', 'auth', function($scope, $state, phoneFormatter, $rootScope, auth) {
   $scope.dataConnexionForm = {};
 
-  if (window.localStorage['user']) {
-    if(JSON.parse(window.localStorage['user']) !== null) {
-      $state.go('map');
-    }
-  }
+  // if (window.localStorage['user']) {
+  //   if(JSON.parse(window.localStorage['user']) !== null) {
+  //     $state.go('map');
+  //   }
+  // }
 
   $scope.createAccount = function() {
     $state.go('registration');
