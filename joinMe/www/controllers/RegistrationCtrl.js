@@ -1,4 +1,4 @@
-starter.controller('RegistrationCtrl', function($scope, $state, phoneFormatter, $ionicLoading, $http, $cordovaToast, auth) {
+starter.controller('RegistrationCtrl', function($scope, $state, phoneFormatter, $ionicLoading, $http, $cordovaToast, auth, $rootScope) {
   $scope.dataRegistration = {};
 
   $scope.create = function() {
@@ -29,6 +29,31 @@ starter.controller('RegistrationCtrl', function($scope, $state, phoneFormatter, 
                   auth.login(phoneNumber, password1, function(loginSuccess) {
                     if (loginSuccess) {
                         $state.go('map');
+                        // INIT PUSH
+                        $rootScope.push = PushNotification.init({
+                            android: {
+                                senderID : '1092182600593'
+                            },
+                            ios: {
+                                alert: "true",
+                                badge: "true",
+                                sound: "true"
+                            }
+                        });
+                        $rootScope.push.on('registration', function(data) {
+                          var registrationId = data.registrationId;
+                          var user_id =  JSON.parse(window.localStorage['user']).id_users;
+                          var OS = ionic.Platform.platform();
+                          // met en bdd pour l'user en question le token de push ainsi que son device (ios ou android)
+                          $http.post(new Ionic.IO.Settings().get('serverUrl') + '/setPushInfos',
+                          {
+                            id : user_id,
+                            token: registrationId,
+                            os: OS,
+                          })
+                          .then(function successCallback(contactsChecked) {}
+                          , function errorCallback(err) {});
+                        });
                     }
                     else {
                         console.log('pas ok du tout');
