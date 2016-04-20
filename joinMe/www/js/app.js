@@ -16,7 +16,7 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
         // INIT PUSH
         $rootScope.push = PushNotification.init({
             android: {
-                senderID : '1092182600593'
+                senderID : new Ionic.IO.Settings().get('senderId')
             },
             ios: {
                 alert: "true",
