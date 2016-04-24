@@ -214,6 +214,14 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
             value: '0666666667'
           }
         ]
+      },
+      {
+        displayName: 'Vic',
+        phoneNumbers: [
+          {
+            value: '0669312159'
+          }
+        ]
       }
     ];
     // récupère les contacts

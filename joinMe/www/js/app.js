@@ -13,31 +13,36 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
       if(JSON.parse(window.localStorage['user']) !== null) {
         //on va direct sur la map page
         $state.go('map');
-        // INIT PUSH
-        $rootScope.push = PushNotification.init({
-            android: {
-                senderID : new Ionic.IO.Settings().get('senderId')
-            },
-            ios: {
-                alert: "true",
-                badge: "true",
-                sound: "true"
-            }
-        });
-        $rootScope.push.on('registration', function(data) {
-          var registrationId = data.registrationId;
-          var user_id =  JSON.parse(window.localStorage['user']).id_users;
-          var OS = ionic.Platform.platform();
-          // met en bdd pour l'user en question le token de push ainsi que son device (ios ou android)
-          $http.post(new Ionic.IO.Settings().get('serverUrl') + '/setPushInfos',
-          {
-            id : user_id,
-            token: registrationId,
-            os: OS,
-          })
-          .then(function successCallback(contactsChecked) {}
-          , function errorCallback(err) {});
-        });
+        if(!new Ionic.IO.Settings().get('isPC')) {
+          // INIT PUSH
+          $rootScope.push = PushNotification.init({
+              android: {
+                  senderID : new Ionic.IO.Settings().get('senderId')
+              },
+              ios: {
+                  alert: "true",
+                  badge: "true",
+                  sound: "true"
+              }
+          });
+          $rootScope.push.on('registration', function(data) {
+            var registrationId = data.registrationId;
+            var user_id =  JSON.parse(window.localStorage['user']).id_users;
+            var OS = ionic.Platform.platform();
+            // met en bdd pour l'user en question le token de push ainsi que son device (ios ou android)
+            $http.post(new Ionic.IO.Settings().get('serverUrl') + '/setPushInfos',
+            {
+              id : user_id,
+              token: registrationId,
+              os: OS,
+            })
+            .then(function successCallback(contactsChecked) {}
+            , function errorCallback(err) {});
+          });
+          $rootScope.push.on('notification', function(data) {
+              $state.go('newInvitation', {invitationId : data.additionalData.invitationId});
+          });
+        }
       }
     }
 
@@ -94,6 +99,15 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     url: '/registration',
     templateUrl: 'templates/registration.html',
     controller: 'RegistrationCtrl'
+  });
+  $stateProvider
+  .state('newInvitation', {
+    url: '/newInvitation',
+    templateUrl: 'templates/newInvitation.html',
+    controller: 'newInvitationCtrl',
+    params: {
+       invitationId: null
+    }
   });
 
   $urlRouterProvider.otherwise("/");

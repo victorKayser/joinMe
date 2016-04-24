@@ -3912,7 +3912,7 @@ var BaseSettings = (function () {
 })();
 
 var temp = new BaseSettings().factory('$ionicCoreSettings', function () {
-  "IONIC_SETTINGS_STRING_START";var settings = {"dev_push":true,"app_id":"656ad69d","api_key":"7d657364bff19a3ca20063eed2617fea957f5516395e6cfb","isPC":false,"serverUrl":"http://192.168.0.11:8181","serverSocketUrl":"http://192.168.0.11:5000","serverUploadFilePath":"http://192.168.0.11/joinMe-server/server/upload.php","serverUploadDirectory":"http://192.168.0.11/joinMe-server/upload/img/"}; return { get: function(setting) { if (settings[setting]) { return settings[setting]; } return null; } };"IONIC_SETTINGS_STRING_END";
+  "IONIC_SETTINGS_STRING_START";var settings = {"dev_push":true,"app_id":"656ad69d","api_key":"7d657364bff19a3ca20063eed2617fea957f5516395e6cfb","isPC":true,"serverUrl":"http://192.168.1.17:8181","serverSocketUrl":"http://192.168.1.17:5000","serverUploadFilePath":"http://192.168.1.17/joinMe-server/server/upload.php","serverUploadDirectory":"http://192.168.1.17/joinMe-server/upload/img/","senderId":"1092182600593"}; return { get: function(setting) { if (settings[setting]) { return settings[setting]; } return null; } };"IONIC_SETTINGS_STRING_END";
 }).finish();
 
 var Settings = (function () {

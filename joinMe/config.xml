@@ -16,7 +16,7 @@
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="screen"/>
   <preference name="SplashScreenDelay" value="3000"/>
-  <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+  <preference name="AndroidPersistentFileLocation" value="Compatibility"/>
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
@@ -40,9 +40,8 @@
     <splash src="resources/android/splash/drawable-port-xxhdpi-screen.png" density="port-xxhdpi"/>
     <splash src="resources/android/splash/drawable-port-xxxhdpi-screen.png" density="port-xxxhdpi"/>
   </platform>
-
   <plugin name="phonegap-plugin-push" spec="1.6.0">
-    <variable name="SENDER_ID" value="1092182600593" />
+    <variable name="SENDER_ID" value="1092182600593"/>
   </plugin>
-
+  <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>
 </widget>

@@ -81,11 +81,20 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
       // contact set ?
       if ($scope.invitationToContact.length > 0) {
         // message toast
-        $cordovaToast.showShortBottom('Invitation sended...').then(function(success) {
-          // redirect to map view
-           $state.go('map');
-         }, function (error) {
-           // error
+        $cordovaToast.showShortBottom('Invitation sended...');
+         // envoi les Invitations
+         var user_id = JSON.parse(window.localStorage['user']).id_users;
+         $http.post(new Ionic.IO.Settings().get('serverUrl') + '/sendInvitation',
+         {
+           id : user_id,
+           invitationObject: $scope.invitationToContact
+         })
+         .then(function successCallback() {
+           // redirect to map view
+            $state.go('map');
+         }
+         , function errorCallback(err) {
+
          });
       }
       // contact no setted
@@ -196,6 +205,9 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
   // on pc
   if ((ionic.Platform.platform() === 'linux') || new Ionic.IO.Settings().get('isPC')) {
     console.log('Start on PC : no contacts');
+    $cordovaToast.showShortBottom = function(text) {
+      console.log(text);
+    }
     $scope.renderEmoji();
     // fictif contact object
     var contacts = [
@@ -212,6 +224,14 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
         phoneNumbers: [
           {
             value: '0666666667'
+          }
+        ]
+      },
+      {
+        displayName: 'Vic',
+        phoneNumbers: [
+          {
+            value: '0669312159'
           }
         ]
       }
