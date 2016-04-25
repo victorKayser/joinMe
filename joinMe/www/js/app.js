@@ -11,8 +11,9 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     // si la personne à un compte et est connectée
     if (window.localStorage['user']) {
       if(JSON.parse(window.localStorage['user']) !== null) {
-        //on va direct sur la map page
+
         $state.go('map');
+
         if(!new Ionic.IO.Settings().get('isPC')) {
           // INIT PUSH
           $rootScope.push = PushNotification.init({
@@ -38,9 +39,6 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
             })
             .then(function successCallback(contactsChecked) {}
             , function errorCallback(err) {});
-          });
-          $rootScope.push.on('notification', function(data) {
-              $state.go('newInvitation', {invitationId : data.additionalData.invitationId});
           });
         }
       }
@@ -99,15 +97,6 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     url: '/registration',
     templateUrl: 'templates/registration.html',
     controller: 'RegistrationCtrl'
-  });
-  $stateProvider
-  .state('newInvitation', {
-    url: '/newInvitation',
-    templateUrl: 'templates/newInvitation.html',
-    controller: 'newInvitationCtrl',
-    params: {
-       invitationId: null
-    }
   });
 
   $urlRouterProvider.otherwise("/");

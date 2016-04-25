@@ -87,7 +87,8 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
          $http.post(new Ionic.IO.Settings().get('serverUrl') + '/sendInvitation',
          {
            id : user_id,
-           invitationObject: $scope.invitationToContact
+           invitationObject: $scope.invitationToContact,
+           position : JSON.parse(window.localStorage['lastPosition']),
          })
          .then(function successCallback() {
            // redirect to map view

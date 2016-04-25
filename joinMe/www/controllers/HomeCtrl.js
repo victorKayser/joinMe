@@ -1,8 +1,10 @@
 starter.controller('HomeCtrl', ['$scope', '$state', 'phoneFormatter', '$rootScope', 'auth', function($scope, $state, phoneFormatter, $rootScope, auth) {
   $scope.dataConnexionForm = {};
 
+  // si la personne à un compte et est connectée
   // if (window.localStorage['user']) {
   //   if(JSON.parse(window.localStorage['user']) !== null) {
+  //     //on va direct sur la map page
   //     $state.go('map');
   //   }
   // }
