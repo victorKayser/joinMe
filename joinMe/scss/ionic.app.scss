@@ -22,8 +22,20 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 @import "www/lib/ionic/scss/ionic";
 
 ng-map {
-  height: 100%;
+  height: 80%;
+  margin-top: 44px;
 }
+.infosMap {
+  height: 20%;
+  position: absolute;
+    bottom: -7%;
+}
+.transport {
+  height: 25px;
+  width: 235px;
+  padding: 5px;
+}
+
 .container-view {
   margin-top: 50px;
 }

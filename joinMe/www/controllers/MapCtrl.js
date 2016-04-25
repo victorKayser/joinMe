@@ -46,6 +46,12 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
   NgMap.getMap().then(function(map) {
     $scope.map = map;
 
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+    var directionsService = new google.maps.DirectionsService();
+    var service = new google.maps.DistanceMatrixService();
+    directionsDisplay.setMap(map);
+
+
     // check in LS if old position are saved
     if (window.localStorage['lastPosition']) {
       var lastPosition = JSON.parse(window.localStorage['lastPosition'] || '{}');
@@ -85,16 +91,35 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           }
         });
 
+        $scope.markerLocalisation.addListener('click', function() {
+          $state.go('invitation');
+        });
         $scope.bounds.extend($scope.markerLocalisation.position);
+
         // si il y a le marker du sender, c'est qu'on vient depuis la notif
         if (typeof($scope.markerSender) !== 'undefined') {
           // donc on fitBounds càd zoom propre en fonction de tous les markers
           map.fitBounds($scope.bounds);
-        }
+          //affiche la div du bottom pour le choix des moyens de transports
+          $scope.showDirection = true;
 
-        $scope.markerLocalisation.addListener('click', function() {
-          $state.go('invitation');
-        });
+          // trace itinéraire piéton par défaut + temps de voyage
+          $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.WALKING, "walk");
+          angular.element(document.querySelectorAll('.walk')).addClass('selected');
+        }
+        $scope.changeTransportKind = function(kind) {
+          angular.element(document.querySelectorAll('.transport')).removeClass('selected');
+          angular.element(document.querySelectorAll('.'+kind)).addClass('selected');
+          if (kind === "walk") {
+            $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.WALKING, "walk");
+          }
+          else if (kind === "bicycle") {
+            $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.BICYCLING, "bicycle");
+          }
+          else {
+            $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.DRIVING, "car");
+          }
+        }
     });
 
     // start the watcher
@@ -123,5 +148,59 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
            $scope.markerLocalisation.setPosition(newlatlng);
          }
      );
+
+     $scope.renderDirection = function(origin, destination, transportKind, memoTransport) {
+       var request = {
+         origin: origin,
+         destination : destination,
+         travelMode : transportKind,
+       };
+       // trace itineraire
+       directionsService.route(request, function(result, status) {
+         if (status == google.maps.DirectionsStatus.OK) {
+           directionsDisplay.setDirections(result);
+
+           // calcul le temps du trajet
+           service.getDistanceMatrix(
+           {
+             origins: [origin],
+             destinations: [destination],
+             travelMode: transportKind,
+           }, callback);
+
+           function callback(response, status) {
+             if (status !== google.maps.DistanceMatrixStatus.OK) {
+               console.log('Error was: ' + status);
+             }
+             else {
+               if (memoTransport === "walk") {
+                 $scope.distance_walk = response.rows[0].elements[0].distance.text + ', ';
+                 $scope.duration_walk = response.rows[0].elements[0].duration.text;
+                 $scope.distance_bicycle = '';
+                 $scope.duration_bicycle = '';
+                 $scope.distance_car = '';
+                 $scope.duration_car = '';
+               }
+               else if (memoTransport === "bicycle") {
+                 $scope.distance_walk = '';
+                 $scope.duration_walk = '';
+                 $scope.distance_bicycle = response.rows[0].elements[0].distance.text + ', ';
+                 $scope.duration_bicycle = response.rows[0].elements[0].duration.text;
+                 $scope.distance_car = '';
+                 $scope.duration_car = '';
+               }
+               else {
+                 $scope.distance_walk = '';
+                 $scope.duration_walk = '';
+                 $scope.distance_bicycle = '';
+                 $scope.duration_bicycle = '';
+                 $scope.distance_car = response.rows[0].elements[0].distance.text + ', ';
+                 $scope.duration_car = response.rows[0].elements[0].duration.text;
+               }
+             }
+           }
+         }
+       });
+     }
   });
 })
