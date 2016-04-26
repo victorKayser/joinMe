@@ -1,5 +1,8 @@
 
 starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http) {
+
+  var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
+
   // disable swipe on the view
   $ionicSideMenuDelegate.canDragContent(false);
   // get all contacts
@@ -90,9 +93,11 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
            invitationObject: $scope.invitationToContact,
            position : JSON.parse(window.localStorage['lastPosition']),
          })
-         .then(function successCallback() {
+         .then(function successCallback(invitationId) {
            // redirect to map view
             $state.go('map');
+            //avec l'id de la nouvelle invitation, on fait rejoindre le sender dans la socket room de cet id
+            socket.emit('joinInvitationRoom', invitationId.data);
          }
          , function errorCallback(err) {
 

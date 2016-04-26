@@ -16,7 +16,12 @@
       <div class="transport car" ng-click="changeTransportKind('car')">
         <i class="ion-android-car"></i> {{distance_car}} {{duration_car}}
       </div>
-
+      <div class="accept" ng-hide="response === true" ng-click="responseInvitation(true)">
+        <i class="ion-checkmark-round"></i> Join
+      </div>
+      <div class="refuse" ng-hide="response === true" ng-click="responseInvitation(false)">
+        <i class="ion-close-round"></i> Refuse
+      </div>
 
     </div>
 </ion-view>
