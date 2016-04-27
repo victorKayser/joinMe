@@ -92,6 +92,7 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
            id : user_id,
            invitationObject: $scope.invitationToContact,
            position : JSON.parse(window.localStorage['lastPosition']),
+           emoji: $scope.selectedEmoji
          })
          .then(function successCallback(invitationId) {
            // redirect to map view

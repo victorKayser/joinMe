@@ -7,14 +7,17 @@
   </ion-nav-buttons>
   <ng-map></ng-map>
     <div class="infosMap" ng-show="showDirection === true">
-      <div class="transport walk" ng-click="changeTransportKind('walk')">
+      <div class="transport walk" kind='walk' ng-click="changeTransportKind('walk')">
         <i class="ion-android-walk"></i> {{distance_walk}} {{duration_walk}}
       </div>
-      <div class="transport bicycle" ng-click="changeTransportKind('bicycle')">
+      <div class="transport bicycle" kind="bicycle" ng-click="changeTransportKind('bicycle')">
         <i class="ion-android-bicycle"></i> {{distance_bicycle}} {{duration_bicycle}}
       </div>
-      <div class="transport car" ng-click="changeTransportKind('car')">
+      <div class="transport car" kind="car" ng-click="changeTransportKind('car')">
         <i class="ion-android-car"></i> {{distance_car}} {{duration_car}}
+      </div>
+      <div class="emojiInvitation">
+          <img src="img/emoji/{{emojiPath}}" alt="" />
       </div>
       <div class="accept" ng-hide="response === true" ng-click="responseInvitation(true)">
         <i class="ion-checkmark-round"></i> Join
@@ -22,6 +25,10 @@
       <div class="refuse" ng-hide="response === true" ng-click="responseInvitation(false)">
         <i class="ion-close-round"></i> Refuse
       </div>
-
+    </div>
+    <div ng-hide="showDirection === true" class="containerBtn">
+      <a ui-sref="invitation">
+        <button class="button button-outline button-positive joinmeBtn">Join Me!</button
+      </a>
     </div>
 </ion-view>

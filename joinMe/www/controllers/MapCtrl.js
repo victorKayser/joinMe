@@ -25,7 +25,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
       else {
         $scope.guessMarker.setPosition(position);
       }
-
     });
   });
 
@@ -50,6 +49,8 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
           var senderLat = parseFloat(sender_position.split(', ')[0]);
           var senderLng = parseFloat(sender_position.split(', ')[1]);
+
+          $scope.emojiPath = invitation.data[0].emoji_path;
 
           NgMap.getMap().then(function(map) {
             // crée le marker du sender
@@ -173,7 +174,14 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             socket.emit('guessIsComming', $scope.invitationId);
 
             // variable qui permet au watcher de savoir si il faut donner au sender la position de l'invité
+            // active quand l'invitation est acceptée
             $scope.emitGuessPosition = true;
+
+            //masque les moyens de transports non selectionnes
+            angular.element(document.querySelectorAll('.transport:not(.selected)')).css({"display": "none"});
+
+            //obtient le type de moyen de transport
+            $scope.validateTransportKind = angular.element(document.querySelectorAll('.transport:not(.selected)')).attr('kind');
 
           }
           //refuse
@@ -218,9 +226,52 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
            if ($scope.emitGuessPosition) {
              //donne au sender ma position
              socket.emit('giveGuessPosition', $scope.invitationId, newlatlng);
+
+             $scope.majTransportDuration(newlatlng, $scope.markerSender.position, $scope.validateTransportKind);
            }
          }
      );
+
+     $scope.majTransportDuration = function(origin, destination, memoTransport) {
+       var transportKind;
+       if(memoTransport === 'bicycle') {
+         transportKind = google.maps.TravelMode.BICYCLING;
+       }
+       else if (memoTransport === 'walk') {
+         transportKind = google.maps.TravelMode.WALKING;
+       }
+       else {
+         transportKind = google.maps.TravelMode.DRIVING;
+       }
+
+       service.getDistanceMatrix(
+       {
+         origins: [origin],
+         destinations: [destination],
+         travelMode: transportKind,
+       }, callback);
+
+       function callback(response, status) {
+         if (status !== google.maps.DistanceMatrixStatus.OK) {
+           console.log('Error was: ' + status);
+         }
+         else {
+           // puis affiche le temps de trajet + distance à l'endroit correspondant
+           if (memoTransport === "walk") {
+             $scope.distance_walk = response.rows[0].elements[0].distance.text + ', ';
+             $scope.duration_walk = response.rows[0].elements[0].duration.text;
+           }
+           else if (memoTransport === "bicycle") {
+             $scope.distance_bicycle = response.rows[0].elements[0].distance.text + ', ';
+             $scope.duration_bicycle = response.rows[0].elements[0].duration.text;
+           }
+           else {
+             $scope.distance_car = response.rows[0].elements[0].distance.text + ', ';
+             $scope.duration_car = response.rows[0].elements[0].duration.text;
+           }
+         }
+       }
+     }
 
      // change les directions en fonction du moyen de transport
      // params:
