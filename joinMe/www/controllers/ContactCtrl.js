@@ -26,6 +26,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
       contacts : filterContact,
     })
     .then(function successCallback(contactsChecked) {
+      window.localStorage['registeredUser'] = JSON.stringify(contactsChecked.data);
       done(null, contactsChecked.data);
     }
     , function errorCallback(err) {

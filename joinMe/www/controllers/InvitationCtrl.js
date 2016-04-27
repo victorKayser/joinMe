@@ -31,6 +31,7 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
       contacts : filterContact,
     })
     .then(function successCallback(contactsChecked) {
+      window.localStorage['registeredUser'] = JSON.stringify(contactsChecked.data);
       done(null, contactsChecked.data);
     }
     , function errorCallback(err) {
@@ -87,12 +88,15 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
         $cordovaToast.showShortBottom('Invitation sended...');
          // envoi les Invitations
          var user_id = JSON.parse(window.localStorage['user']).id_users;
+         var sender_phoneNumber = JSON.parse(window.localStorage['user']).phone_number;
          $http.post(new Ionic.IO.Settings().get('serverUrl') + '/sendInvitation',
          {
            id : user_id,
            invitationObject: $scope.invitationToContact,
            position : JSON.parse(window.localStorage['lastPosition']),
-           emoji: $scope.selectedEmoji
+           emoji: $scope.selectedEmoji,
+           sender_phoneNumber : sender_phoneNumber,
+
          })
          .then(function successCallback(invitationId) {
            // redirect to map view

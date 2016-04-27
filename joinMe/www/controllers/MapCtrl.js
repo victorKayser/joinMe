@@ -1,4 +1,4 @@
-starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast) {
+starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone) {
   //arrivée sur l'appli
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
@@ -50,6 +50,16 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           var senderLat = parseFloat(sender_position.split(', ')[0]);
           var senderLng = parseFloat(sender_position.split(', ')[1]);
 
+          var senderPhone = invitation.data[0].sender_phoneNumber;
+
+          var senderImg;
+          if (typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') {
+            senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
+          }
+          else {
+            senderImg = "img/ionic.png";
+          }
+
           $scope.emojiPath = invitation.data[0].emoji_path;
 
           NgMap.getMap().then(function(map) {
@@ -60,7 +70,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
                title: 'test',
                draggable: false,
                icon: {
-                 url : 'img/marker-user.png',
+                 url : senderImg,
                  scaledSize: new google.maps.Size(20, 20)
                }
             });
