@@ -6,16 +6,24 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
       console.log('socket server authentification : OK billy');
   });
 
-  socket.on('getGuessPosition', function(position) {
+  socket.on('getGuessPosition', function(position, guessPhone) {
     NgMap.getMap().then(function(map) {
       if (!$scope.guessMarker) {
+
+        var guessImg;
+        if (typeof(getUserInfosByPhone.getInfos(guessPhone)) !== 'undefined') {
+          guessImg = getUserInfosByPhone.getInfos(guessPhone).image_path;
+        }
+        else {
+          guessImg = "img/marker-user.png";
+        }
         $scope.guessMarker = new google.maps.Marker({
            position: position,
            map: map,
            title: 'test',
            draggable: false,
            icon: {
-             url : 'img/marker-user.png',
+             url : guessImg,
              scaledSize: new google.maps.Size(20, 20)
            }
          });
@@ -53,11 +61,11 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           var senderPhone = invitation.data[0].sender_phoneNumber;
 
           var senderImg;
-          if (typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') {
-            senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
+          if ((typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
+              senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
           }
           else {
-            senderImg = "img/ionic.png";
+            senderImg = "img/marker-user.png";
           }
 
           $scope.emojiPath = invitation.data[0].emoji_path;
@@ -235,7 +243,8 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
            if ($scope.emitGuessPosition) {
              //donne au sender ma position
-             socket.emit('giveGuessPosition', $scope.invitationId, newlatlng);
+             var myPhone = JSON.parse(window.localStorage['user']).phone_number;
+             socket.emit('giveGuessPosition', $scope.invitationId, newlatlng, myPhone);
 
              $scope.majTransportDuration(newlatlng, $scope.markerSender.position, $scope.validateTransportKind);
            }
