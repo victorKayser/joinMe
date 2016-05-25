@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^2.10.0",
+    "connect-pause": "^0.1.0",
+    "format": "^0.2.1",
+    "moment": "^2.10.6",
+    "node-uuid": "^1.4.3",
+    "nodemailer": "^1.8.0",
+    "nodemailer-sendmail-transport": "^1.0.0"
+  }
+}

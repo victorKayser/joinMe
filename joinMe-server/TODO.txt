@@ -1,0 +1,67 @@
+## Roadmap
+
+### Code
+
+- Vérifier que R.js fonctionne avec Phonegap
+- Le faire fonctionner sur un android 2.3/4/5
+- Renommer les classes d'une façon plus cohérente
+- Passer l'authentification dans le boilerplate
+    + Client / Serveur
+    + Optionnel
+- Automatiser le routing
+    - Faire un layout de base dans Core
+    - Faire du router un singleton accessible dans toute l'app
+    - Gérer les changement de vue avec le router
+- Design
+    + Régler le problème du scrolling au changement de page
+    + Régler problème de position fixed
+    + Régler chargement de page avant transition
+- Conserver l'état des pages au changement
+- Serveur
+    + Factoriser le serveur
+    + MongoDB
+        * Authentification
+        * Lancement au démarrage
+- Gérer les erreurs
+    + Handler global envoyant un mail ?
+    + Relancer automatiquement le serveur
+
+### Fonctionnalités
+- Splashscreen
+- Icônes
+- Sitlor
+    + Faire un SitlorAppBoilerplate
+        * Fiches dans un Singleton
+- Internationalisation
+- Google Maps
+- Géolocalisation
+- Slider
+- Appareil Photo
+
+### Doc
+- Général
+    + Mise en place
+        * Fichier de configuration
+    + Développement
+    + Mise à jour (du core)
+    + Push upstream (vers le core)
+- Serveur
+    - Mettre à jour le npm json
+    - nodemon : sudo npm install -g nodemon
+    - Tuto passport ?
+    - Tuto mongodb
+        Installation : sudo apt-get install mongodb
+        Shell : mongo
+        Authentification : mongo / use admin / db.addUser()
+        Configuration : sudo nano /etc/mongodb.conf / auth = true
+        - Script de création de la base de données (ou au moins tuto)
+    - Documenter les modules à installer (mongoose, restify, node, mongodb, passport, passport-http, ...)
+    - Redémarrage automatique d'un serveur node : http://stackoverflow.com/a/16548045
+    - Faire le tri dans les dépendances (notamment nodemon)
+- Client
+    + Mise en production
+        * compilation : r.js -o build.js (depuis www)
+        * remplacement de js/app par dist/main dans l'index
+        * Compiler CSS
+        * Remise en place du cache
+        * Fichier de configuration

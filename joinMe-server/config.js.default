@@ -1,0 +1,26 @@
+'use strict';
+
+var config = {
+    port: 8181,
+    db: {
+        mysql: {
+            host: '',
+            username: '',
+            password: '',
+            database: '',
+        },
+    },
+    corsOrigin: '*',
+    cache: {
+        disable: true, // enabled if not present
+    },
+
+    debugMailSender: 'v.kayser@gmail.com',
+    serverURL: 'http://192.168.2.2:8183',
+    chatServerPort: 5000,
+    pathUploadedImages : '',
+    phpScriptPathPushNotification : "xxx.php",
+    environment: 'local',
+};
+
+module.exports = config;

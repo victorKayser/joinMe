@@ -1,0 +1,23 @@
+{
+  "name": "yay-server",
+  "version": "0.0.0",
+  "description": "The server part of [Phonegap Boilerplate](https://github.com/dorian-marchal/phonegap-boilerplate).",
+  "main": "server/server.js",
+  "dependencies": {
+    "gulp": "~3.9.0",
+    "gulp-nodemon": "~2.0.3"
+  },
+  "devDependencies": {
+    "gulp": "~3.9.0",
+    "gulp-nodemon": "~2.0.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.moobee.fr:yay-server.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause"
+}

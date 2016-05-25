@@ -1,0 +1,15 @@
+<?php
+
+define('DB_HOST', '');
+define('DB_NAME', '');
+define('DB_USER', '');
+define('DB_PASS', '');
+
+define('NB_DAYS_BEFORE_RAISE', 7);
+define('MIN_HUBZ_DURATION', 3);
+
+define('URL_API_SEND_MAIL', 'http://url/sendMail'); // cette route doit correspondre avec serverURL de config.js + /sendMail
+define('NB_DAYS_BEFORE_RAISE_PROFIL', 2);
+define('NB_DAYS_MAX_OLD_IMAGES', 50);
+
+ ?>
