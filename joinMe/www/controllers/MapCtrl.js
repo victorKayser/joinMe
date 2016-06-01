@@ -1,4 +1,4 @@
-starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone) {
+starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $interval) {
   //arrivée sur l'appli
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
@@ -128,7 +128,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
        );
        // zoom
        $scope.map.setZoom(15);
-
        // init the marker
        $scope.markerLocalisation = new google.maps.Marker({
           position: {lat: lat, lng: lng},
@@ -136,10 +135,26 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           title: 'test',
           draggable: false,
           icon: {
-            url : 'img/marker-user.png',
-            scaledSize: new google.maps.Size(20, 20)
+            path : 'M17 32c-0.072 0-0.144-0.008-0.217-0.024-0.458-0.102-0.783-0.507-0.783-0.976v-15h-15c-0.469 0-0.875-0.326-0.976-0.783s0.129-0.925 0.553-1.123l30-14c0.381-0.178 0.833-0.098 1.13 0.199s0.377 0.749 0.199 1.13l-14 30c-0.167 0.358-0.524 0.577-0.906 0.577zM5.508 14h11.492c0.552 0 1 0.448 1 1v11.492l10.931-23.423-23.423 10.931z',
           }
         });
+
+        // start the watcher for phone orientation
+        var options = {
+           frequency: 1500
+        }
+        var watch = $cordovaDeviceOrientation.watchHeading(options).then(
+         null,
+         function(error) {
+           // An error occurred
+         },
+         function(result) {   // updates constantly (depending on frequency value)
+           var magneticHeading = result.magneticHeading;
+           var icon = $scope.markerLocalisation.get('icon');
+           icon.rotation = result.magneticHeading;
+           $scope.markerLocalisation.set('icon', icon);
+         }
+        );
 
         $scope.markerLocalisation.addListener('click', function() {
           $state.go('invitation');
@@ -214,6 +229,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             $scope.map.setZoom(15);
           }
         }
+
     });
 
     // start the watcher géoloc

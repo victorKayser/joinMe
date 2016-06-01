@@ -16,9 +16,8 @@ var config = {
     },
 
     debugMailSender: 'v.kayser@gmail.com',
-    serverURL: 'http://192.168.2.2:8183',
     chatServerPort: 5000,
-    pathUploadedImages : 'http://192.168.1.17/joinMe/joinMe-server/upload/img/',
+    pathUploadedImages : 'http://192.168.0.11/joinMe/joinMe-server/upload/img/',
     phpScriptPathPushNotification : "pushNotification.php",
 
 };
