@@ -371,14 +371,19 @@ var onStart = function() {
     })
 
     app.post('/getInvitationInfos', function(req, res) {
-        var invitation_id = req.body.id;
+        var invitation_id = req.body.invitation_id;
+        var user_id = req.body.user_id;
+
         if (!invitation_id) {
             res.sendStatus(401);
             return;
         }
 
         var invitation = knex('invitations')
-            .where('id_invitations', '=', invitation_id)
+            .join('user_has_invitation', 'user_has_invitation.invitation_id', '=', 'invitations.id_invitations')
+            .where('invitations.id_invitations', '=', invitation_id)
+            .andWhere('user_has_invitation.user_id', '=', user_id)
+            .andWhere('user_has_invitation.is_finished', '=', 0)
         ;
 
         invitation
