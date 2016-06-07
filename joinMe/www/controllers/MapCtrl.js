@@ -127,7 +127,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           new google.maps.LatLng(lat, lng)
        );
        // zoom
-       $scope.map.setZoom(15);
+       $scope.map.setZoom(16);
        // init the marker
        $scope.markerLocalisation = new google.maps.Marker({
           position: {lat: lat, lng: lng},
@@ -226,7 +226,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             // chache la div
             $scope.showDirection = false;
             // zoom
-            $scope.map.setZoom(15);
+            $scope.map.setZoom(16);
           }
         }
 
