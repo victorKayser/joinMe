@@ -36,59 +36,70 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     });
   });
 
-  socket.on('newGuessIsComming', function() {
-      $cordovaToast.showShortBottom('New guess is comming!');
-  });
-
   $scope.bounds = new google.maps.LatLngBounds();
 
   if(!new Ionic.IO.Settings().get('isPC')) {
-    // quand notif pour novuel invit, on ajoute la marker du sender sur la map
+
     $rootScope.push.on('notification', function(data) {
+        // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
+        if (typeof(data.additionalData.invitationId !== 'undefined')) {
+          $scope.invitationId = data.additionalData.invitationId;
 
-        $scope.invitationId = data.additionalData.invitationId;
+          $http.post(new Ionic.IO.Settings().get('serverUrl') + '/getInvitationInfos',
+          {
+            invitation_id : data.additionalData.invitationId,
+            user_id : JSON.parse(window.localStorage['user']).id_users,
+          })
+          .then(function successCallback(invitation) {
+            // si l'invitation est toujours actuelle
+            if (invitation.data.length > 0) {
+              var sender_position = invitation.data[0].sender_position;
 
-        $http.post(new Ionic.IO.Settings().get('serverUrl') + '/getInvitationInfos',
-        {
-          id : data.additionalData.invitationId,
-        })
-        .then(function successCallback(invitation) {
-          var sender_position = invitation.data[0].sender_position;
+              var senderLat = parseFloat(sender_position.split(', ')[0]);
+              var senderLng = parseFloat(sender_position.split(', ')[1]);
 
-          var senderLat = parseFloat(sender_position.split(', ')[0]);
-          var senderLng = parseFloat(sender_position.split(', ')[1]);
+              var senderPhone = invitation.data[0].sender_phoneNumber;
 
-          var senderPhone = invitation.data[0].sender_phoneNumber;
+              var senderImg;
+              if ((typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
+                  senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
+              }
+              else {
+                senderImg = "img/marker-user.png";
+              }
 
-          var senderImg;
-          if ((typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
-              senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
+              $scope.emojiPath = invitation.data[0].emoji_path;
+
+              NgMap.getMap().then(function(map) {
+                // crée le marker du sender
+                $scope.markerSender = new google.maps.Marker({
+                   position: {lat: senderLat, lng: senderLng},
+                   map: map,
+                   title: 'test',
+                   draggable: false,
+                   icon: {
+                     url : senderImg,
+                     scaledSize: new google.maps.Size(20, 20)
+                   }
+                });
+                // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
+                $scope.bounds.extend($scope.markerSender.position);
+              });
+            }
+            // invitation terminée
+            else {
+
+            }
           }
-          else {
-            senderImg = "img/marker-user.png";
-          }
-
-          $scope.emojiPath = invitation.data[0].emoji_path;
-
-          NgMap.getMap().then(function(map) {
-            // crée le marker du sender
-            $scope.markerSender = new google.maps.Marker({
-               position: {lat: senderLat, lng: senderLng},
-               map: map,
-               title: 'test',
-               draggable: false,
-               icon: {
-                 url : senderImg,
-                 scaledSize: new google.maps.Size(20, 20)
-               }
-            });
-            // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
-            $scope.bounds.extend($scope.markerSender.position);
+          , function errorCallback(err) {
+            console.log(err);
           });
         }
-        , function errorCallback(err) {
-          console.log(err);
-        });
+        // notif pour nouvel invité recue par le sender
+        else {
+
+        }
+
     });
   }
 
@@ -171,7 +182,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           // trace itinéraire piéton par défaut + temps de voyage
           $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.WALKING, "walk");
           angular.element(document.querySelectorAll('.walk')).addClass('selected');
-        }
+         }
 
         // au click sur différent moyens de transport
         $scope.changeTransportKind = function(kind) {
@@ -204,6 +215,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             $scope.map.setZoom(17);
             //avec l'id de la nouvelle invitation, on fait rejoindre l'invité dans la socket room de cet id ou se situe le sender
             socket.emit('joinInvitationRoom', $scope.invitationId);
+
             socket.emit('guessIsComming', $scope.invitationId);
 
             // variable qui permet au watcher de savoir si il faut donner au sender la position de l'invité
@@ -229,6 +241,18 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             $scope.map.setZoom(16);
           }
         }
+
+        // lors de l'arrivée sur la carte, essai de récupérer si il y a des invitations en cours
+        // ou l'user en question est le sender
+        $http.post(new Ionic.IO.Settings().get('serverUrl') + '/checkPendingInvitation',
+        {
+          user_id : JSON.parse(window.localStorage['user']).id_users,
+        })
+        .then(function successCallback(invitations) {
+            socket.emit('joinPendingInvitationRoom', invitations.data);
+        }, function errorCallback(err) {
+          console.log(err);
+        });
 
     });
 

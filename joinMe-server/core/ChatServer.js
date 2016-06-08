@@ -30,8 +30,36 @@ var ChatServer = function() {
         socket.on('giveGuessPosition', function(room, position, phone) {
             socket.to(room).emit('getGuessPosition', position, phone);
         });
+
+        socket.on('joinPendingInvitationRoom', function(invitations) {
+            for (var invitation in invitations) {
+                socket.join(invitations[invitation].id_invitations);
+            }
+        });
+
+
+        // notifie le sender quand l'invité accepte l'invitation
         socket.on('guessIsComming', function(room) {
-            socket.to(room).emit('newGuessIsComming');
+
+            var phpScriptPath = config.phpScriptPathPushNotification;
+            // obtention du token de push du le sender via l'invitation_id
+            var invitation = knex('invitations')
+                .join('users', 'users.id_users', '=', 'invitations.sender_id')
+                .where('invitations.id_invitations', '=', room)
+                .select('users.push_token')
+            ;
+            invitation.bind({}).then(function(data){
+                var argsString = 'guestIsComming ' + data.push_token;
+
+                // si lancé par gulp, mettre server/, sinon rien
+                runner.exec("php " + "server/" + phpScriptPath + " " +argsString, function(err, phpResponse, stderr) {
+                    if(err) {
+                        console.log(err);
+                    }
+                    //console.log( phpResponse );
+                });
+            })
+
         });
 
     });

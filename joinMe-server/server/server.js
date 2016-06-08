@@ -397,6 +397,28 @@ var onStart = function() {
         ;
 
     });
+
+    app.post('/checkPendingInvitation', function(req, res) {
+        var user_id = req.body.user_id;
+        if (!user_id) {
+            res.sendStatus(401);
+            return;
+        }
+        var invitations = knex('invitations')
+            .join('user_has_invitation', 'invitations.id_invitations', '=', 'user_has_invitation.invitation_id')
+            .where('invitations.sender_id', '=', user_id)
+            .andWhere('user_has_invitation.is_finished', '=', 0)
+        ;
+        invitations.bind({})
+            .then(function(data){
+                res.json(data);
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        ;
+    });
+
 };
 
 server.start(onStart);

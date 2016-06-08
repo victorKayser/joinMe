@@ -3,39 +3,57 @@
   define( 'API_ACCESS_KEY', 'AIzaSyAVBJP2BHN1PoAzEqSuVNzODBXk23ix0ZI' );
   $registrationIds = array();
 
-  // boucle sur les paramètres $argv
-  // à partir du 3 car le 0 = le nom du fichier
-  // 1 la raison du push (new invitation, etc)
-  // 2 l'id de l'invitation
-  // ceux a partir de 3 doivent correspondre à des tokens UNIQUEMENT
-  // et les push dans un tableau de token
-  foreach ($argv as $key => $value) {
-    if ($key >2){
-      array_push($registrationIds, $value);
-    }
-  }
-  $msg = '';
-  $title = '';
-
   if ($argv[1] === "newInvitation") {
     $title= "You have an invitation!";
-    $msg = "Click to open";
+    $message = "Click to open";
+
+    // boucle sur les paramètres $argv
+    // à partir du 3 car le 0 = le nom du fichier
+    // 1 la raison du push (new invitation, etc)
+    // 2 l'id de l'invitation
+    // ceux a partir de 3 doivent correspondre à des tokens UNIQUEMENT
+    // et les push dans un tableau de token
+    foreach ($argv as $key => $value) {
+      if ($key >2){
+        array_push($registrationIds, $value);
+      }
+    }
+    // prep the bundle
+    $msg = array
+    (
+    	'message' 	=> $message,
+    	'title'		=> $title,
+    	'subtitle'	=> 'This is a subtitle. subtitle',
+    	'tickerText'	=> 'Ticker text here...Ticker text here...Ticker text here',
+    	'vibrate'	=> 1,
+    	'sound'		=> 'default',
+    	'image'	=> 'icon',
+      'icon' => 'ic_stat_j',
+      'ledColor' => [0, 0, 255, 0],
+      'invitationId' => $argv[2]
+    );
+  }
+  elseif($argv[1] === "guestIsComming") {
+    $title= "A guest is comming !";
+    $message = "Click to open";
+    
+    array_push($registrationIds, $argv[2]);
+    // prep the bundle
+    $msg = array
+    (
+    	'message' 	=> $message,
+    	'title'		=> $title,
+    	'subtitle'	=> 'This is a subtitle. subtitle',
+    	'tickerText'	=> 'Ticker text here...Ticker text here...Ticker text here',
+    	'vibrate'	=> 1,
+    	'sound'		=> 'default',
+    	'image'	=> 'icon',
+      'icon' => 'ic_stat_j',
+      'ledColor' => [0, 0, 255, 0],
+      'guestIsComming' => true
+    );
   }
 
-  // prep the bundle
-  $msg = array
-  (
-  	'message' 	=> $msg,
-  	'title'		=> $title,
-  	'subtitle'	=> 'This is a subtitle. subtitle',
-  	'tickerText'	=> 'Ticker text here...Ticker text here...Ticker text here',
-  	'vibrate'	=> 1,
-  	'sound'		=> 'default',
-  	'image'	=> 'icon',
-    'icon' => 'ic_stat_j',
-    'ledColor' => [0, 0, 255, 0],
-    'invitationId' => $argv[2]
-  );
   $fields = array
   (
   	'registration_ids' 	=> $registrationIds,
