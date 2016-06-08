@@ -408,6 +408,7 @@ var onStart = function() {
             .join('user_has_invitation', 'invitations.id_invitations', '=', 'user_has_invitation.invitation_id')
             .where('invitations.sender_id', '=', user_id)
             .andWhere('user_has_invitation.is_finished', '=', 0)
+            .andWhere('user_has_invitation.accepted', '=', 1)
         ;
         invitations.bind({})
             .then(function(data){

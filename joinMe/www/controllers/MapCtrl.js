@@ -216,7 +216,9 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             //avec l'id de la nouvelle invitation, on fait rejoindre l'invité dans la socket room de cet id ou se situe le sender
             socket.emit('joinInvitationRoom', $scope.invitationId);
 
-            socket.emit('guessIsComming', $scope.invitationId);
+            var user_id = JSON.parse(window.localStorage['user']).id_users;
+
+            socket.emit('guessIsComming', $scope.invitationId, user_id);
 
             // variable qui permet au watcher de savoir si il faut donner au sender la position de l'invité
             // active quand l'invitation est acceptée

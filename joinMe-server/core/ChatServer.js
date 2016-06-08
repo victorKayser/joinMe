@@ -18,6 +18,7 @@ var ChatServer = function() {
 
     var server = require('http').createServer();
     var io = require('socket.io')(server);
+    var runner = require("child_process");
 
     var prefixedUserRoom = 'room';
 
@@ -39,7 +40,7 @@ var ChatServer = function() {
 
 
         // notifie le sender quand l'invité accepte l'invitation
-        socket.on('guessIsComming', function(room) {
+        socket.on('guessIsComming', function(room, user_id) {
 
             var phpScriptPath = config.phpScriptPathPushNotification;
             // obtention du token de push du le sender via l'invitation_id
@@ -48,17 +49,37 @@ var ChatServer = function() {
                 .where('invitations.id_invitations', '=', room)
                 .select('users.push_token')
             ;
-            invitation.bind({}).then(function(data){
-                var argsString = 'guestIsComming ' + data.push_token;
+            invitation.bind({})
+                .then(function(data){
+                    var argsString = 'guestIsComming ' + data.push_token;
 
-                // si lancé par gulp, mettre server/, sinon rien
-                runner.exec("php " + "server/" + phpScriptPath + " " +argsString, function(err, phpResponse, stderr) {
-                    if(err) {
-                        console.log(err);
-                    }
-                    //console.log( phpResponse );
-                });
-            })
+                    // si lancé par gulp, mettre server/, sinon rien
+                    runner.exec("php " + "server/" + phpScriptPath + " " +argsString, function(err, phpResponse, stderr) {
+                        if(err) {
+                            console.log(err);
+                        }
+                        //console.log( phpResponse );
+
+                        // mentionne en bdd que l'invitation est acceptée par l'utilisateur invité
+                        var invitationAccepted = knex('user_has_invitation')
+                            .where('user_id', '=', user_id)
+                            .andWhere('invitation_id', '=', room)
+                            .update({
+                                accepted : 1,
+                            })
+                        ;
+                        invitationAccepted.bind({})
+                            .then(function(data){
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                            })
+                        ;
+                    });
+                })
+                .catch(function(err){
+                    console.log(err);
+                })
 
         });
 
