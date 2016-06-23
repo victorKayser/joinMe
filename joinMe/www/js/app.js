@@ -12,6 +12,10 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     if (window.localStorage['user']) {
       if(JSON.parse(window.localStorage['user']) !== null) {
 
+        //join la room correspondant à mon id
+        var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
+        socket.emit('joinMyIdRoom', JSON.parse(window.localStorage['user']).id_users);
+
         $state.go('map');
 
         if(!new Ionic.IO.Settings().get('isPC')) {

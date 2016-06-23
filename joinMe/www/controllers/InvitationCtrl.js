@@ -84,8 +84,6 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
     if (typeof($scope.emojiIsValidate) !== 'undefined') {
       // contact set ?
       if ($scope.invitationToContact.length > 0) {
-        // message toast
-        $cordovaToast.showShortBottom('Invitation sended...');
          // envoi les Invitations
          var user_id = JSON.parse(window.localStorage['user']).id_users;
          var sender_phoneNumber = JSON.parse(window.localStorage['user']).phone_number;
@@ -98,11 +96,13 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
            sender_phoneNumber : sender_phoneNumber,
 
          })
-         .then(function successCallback(invitationId) {
+         .then(function successCallback(data) {
            // redirect to map view
             $state.go('map');
             //avec l'id de la nouvelle invitation, on fait rejoindre le sender dans la socket room de cet id
-            socket.emit('joinInvitationRoom', invitationId.data);
+            socket.emit('joinInvitationRoom', data.data.invitationId);
+            socket.emit('preventSenderInvited', data.data.tabUserId, data.data.invitationId);
+            $cordovaToast.showShortBottom('Invitation sended...');
          }
          , function errorCallback(err) {
 
@@ -129,6 +129,8 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
 
   // incrémente l'objet qui contient les contacts pour l'invitation
   $scope.doIfChecked = function(res, phoneNumber) {
+    //supprime les espaces dans le numéro
+    phoneNumber = phoneNumber.replace(/\s/g, '');
     // coche la case : add contact (number)
     if (res) {
       //s'il y a du monde
@@ -235,6 +237,14 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
         phoneNumbers: [
           {
             value: '0666666667'
+          }
+        ]
+      },
+      {
+        displayName: 'Wiko',
+        phoneNumbers: [
+          {
+            value: '0606060606'
           }
         ]
       },

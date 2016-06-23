@@ -331,7 +331,7 @@ var onStart = function() {
                 getTokenForNumber
                     // ici sont retournés les infos des users invités
                     .then(function(users){
-
+                        var tabUserId = [];
                         users.map(function(user, key) {
                             argsString = argsString + user.push_token + ' ';
                             // insere dans la nouvelle invitation les personnes
@@ -341,6 +341,7 @@ var onStart = function() {
                                     invitation_id : invitationId
                                 })
                             ;
+                            tabUserId.push(user.id_users);
                         })
                         var phpScriptPath = config.phpScriptPathPushNotification;
                         // si lancé par gulp, mettre server/, sinon rien
@@ -354,7 +355,11 @@ var onStart = function() {
                         // exécute la requête qui insère dans la table user_has_invitation les personnes invitées
                         newUserHasInvitation
                             .then(function(data){
-                                res.json(invitationId);
+                                var data = {
+                                    invitationId : invitationId,
+                                    tabUserId : tabUserId
+                                };
+                                res.json(data);
                                 return;
                             })
                             .catch(function(err){
@@ -388,6 +393,7 @@ var onStart = function() {
 
         invitation
             .then(function(data){
+                console.log(data);
                 res.json(data);
                 return;
             })
@@ -398,7 +404,7 @@ var onStart = function() {
 
     });
 
-    app.post('/checkPendingInvitation', function(req, res) {
+    app.post('/checkSenderPendingInvitation', function(req, res) {
         var user_id = req.body.user_id;
         if (!user_id) {
             res.sendStatus(401);
@@ -412,13 +418,79 @@ var onStart = function() {
         ;
         invitations.bind({})
             .then(function(data){
-                res.json(data);
+                var goodData = [];
+                var now = moment().format('YYYY-MM-DD hh:mm:ss');
+                data.map(function(invitation){
+                    var date = moment(invitation.date);
+                    var diff = moment(now).diff(date, 'hours');
+                    if (diff <= config.minHourInvitationExpiration) {
+                        goodData.push(invitation);
+                    }
+                });
+                res.json(goodData);
             })
             .catch(function(err){
                 console.log(err);
             })
         ;
     });
+
+    app.post('/checkGuestPendingInvitation', function(req, res) {
+        var user_id = req.body.user_id;
+        if (!user_id) {
+            res.sendStatus(401);
+            return;
+        }
+        var invitations = knex('invitations')
+            .join('user_has_invitation', 'invitations.id_invitations', '=', 'user_has_invitation.invitation_id')
+            .where('user_has_invitation.user_id', '=', user_id)
+            .andWhere('user_has_invitation.is_finished', '=', 0)
+            .andWhere('user_has_invitation.accepted', '=', 1)
+        ;
+        invitations.bind({})
+            .then(function(data){
+                var goodData = [];
+                var now = moment().format('YYYY-MM-DD hh:mm:ss');
+                data.map(function(invitation){
+                    var date = moment(invitation.date);
+                    var diff = moment(now).diff(date, 'hours');
+                    if (diff <= 1) {
+                        goodData.push(invitation);
+                    }
+                })
+                res.json(goodData);
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        ;
+    });
+
+    app.post('/closeInvitation', function(req, res) {
+        var user_id = req.body.user_id;
+        var invitationId = req.body.invitation_id;
+        if (!(user_id && invitationId)) {
+            res.sendStatus(401);
+            return;
+        }
+        var finishedInvitation = knex('user_has_invitation')
+            .update({
+                is_finished : 1,
+            })
+            .where('user_id', '=', user_id)
+            .andWhere('invitation_id', '=', invitationId)
+        ;
+        finishedInvitation.bind({})
+            .then(function(result){
+                res.json(result);
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        ;
+    });
+
+
 
 };
 

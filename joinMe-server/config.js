@@ -19,6 +19,7 @@ var config = {
     chatServerPort: 5000,
     pathUploadedImages : 'http://192.168.0.11/joinMe/joinMe-server/upload/img/',
     phpScriptPathPushNotification : "pushNotification.php",
+    minHourInvitationExpiration : 1,
 
 };
 

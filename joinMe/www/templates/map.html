@@ -6,15 +6,16 @@
     <i ng-hide="activeTab == 'home'" class="ion-gear-a" ui-sref="settings"></i>
   </ion-nav-buttons>
   <ng-map></ng-map>
+    <button ng-show="showClosePendingInvitation" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <div class="infosMap" ng-show="showDirection === true">
       <div class="transport walk" kind='walk' ng-click="changeTransportKind('walk')">
-        <i class="ion-android-walk"></i> {{distance_walk}} {{duration_walk}}
+        <i class="ion-android-walk"></i> <span class="transport walk"></span>
       </div>
       <div class="transport bicycle" kind="bicycle" ng-click="changeTransportKind('bicycle')">
-        <i class="ion-android-bicycle"></i> {{distance_bicycle}} {{duration_bicycle}}
+        <i class="ion-android-bicycle"></i> <span class="transport bicycle"></span>
       </div>
       <div class="transport car" kind="car" ng-click="changeTransportKind('car')">
-        <i class="ion-android-car"></i> {{distance_car}} {{duration_car}}
+        <i class="ion-android-car"></i> <span class="transport car"></span>
       </div>
       <div class="emojiInvitation">
           <img src="img/emoji/{{emojiPath}}" alt="" />

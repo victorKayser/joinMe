@@ -25,9 +25,19 @@ var ChatServer = function() {
     io.sockets.on('connection', function (socket) {
         socket.emit('authentification');
 
+        socket.on('joinMyIdRoom', function(user_id) {
+            socket.join(user_id);
+        });
+
         socket.on('joinInvitationRoom', function(invitationId) {
             socket.join(invitationId);
         });
+        socket.on('preventSenderInvited', function(tabUser, invitationId) {
+            for (var user in tabUser) {
+                socket.to(tabUser[user]).emit('preventInvitationAppInBackground', invitationId);
+            }
+        });
+
         socket.on('giveGuessPosition', function(room, position, phone) {
             socket.to(room).emit('getGuessPosition', position, phone);
         });
@@ -37,6 +47,10 @@ var ChatServer = function() {
                 socket.join(invitations[invitation].id_invitations);
             }
         });
+        socket.on('guestArrived', function(invitationId, phone) {
+            socket.to(invitationId).emit('preventSenderGuestArrived', phone);
+        });
+
 
 
         // notifie le sender quand l'invité accepte l'invitation

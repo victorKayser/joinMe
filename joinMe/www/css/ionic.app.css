@@ -9894,3 +9894,17 @@ ng-map {
 
 .icon-right {
   float: right; }
+
+.closePendingInvitation {
+  position: absolute;
+  top: 60px;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  background-color: #ff5000;
+  border-radius: 50px;
+  border: none; }
+
+.ion-close-round {
+  font-size: 25px;
+  color: white; }
