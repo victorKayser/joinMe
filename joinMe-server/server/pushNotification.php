@@ -36,8 +36,53 @@
   elseif($argv[1] === "guestIsComming") {
     $title= "A guest is comming !";
     $message = "Click to open";
-    
+
     array_push($registrationIds, $argv[2]);
+    // prep the bundle
+    $msg = array
+    (
+    	'message' 	=> $message,
+    	'title'		=> $title,
+    	'subtitle'	=> 'This is a subtitle. subtitle',
+    	'tickerText'	=> 'Ticker text here...Ticker text here...Ticker text here',
+    	'vibrate'	=> 1,
+    	'sound'		=> 'default',
+    	'image'	=> 'icon',
+      'icon' => 'ic_stat_j',
+      'ledColor' => [0, 0, 255, 0],
+      'guestIsComming' => true
+    );
+  }
+  elseif ($argv[1] === "senderCloseInvitation") {
+    $title= "End of invitation";
+    $message = "Click to open";
+
+    foreach ($argv as $key => $value) {
+      if ($key >1){
+        array_push($registrationIds, $value);
+      }
+    }
+    // prep the bundle
+    $msg = array
+    (
+    	'message' 	=> $message,
+    	'title'		=> $title,
+    	'subtitle'	=> 'This is a subtitle. subtitle',
+    	'tickerText'	=> 'Ticker text here...Ticker text here...Ticker text here',
+    	'vibrate'	=> 1,
+    	'sound'		=> 'default',
+    	'image'	=> 'icon',
+      'icon' => 'ic_stat_j',
+      'ledColor' => [0, 0, 255, 0],
+      'guestIsComming' => true
+    );
+  }
+  elseif ($argv[1] === "guestCloseInvitation") {
+    $title= "A guest is leaving the invitation";
+    $message = "Click to open";
+
+    array_push($registrationIds, $argv[2]);
+    
     // prep the bundle
     $msg = array
     (

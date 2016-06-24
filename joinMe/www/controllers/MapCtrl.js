@@ -19,10 +19,14 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
       if (($scope.guestPhone) && (!$scope.guestPhone.visible)) {
         $scope.guestPhone.setMap(map);
         $scope.guestPhone.setVisible(true);
+        $ionicPopup.alert({
+           title: 'Informations',
+           template: guestName + ' arrive vers vous.',
+        });
       }
       if (!$scope.guestPhone) {
         var guessImg;
-        if (typeof(getUserInfosByPhone.getInfos(guestPhone)) !== 'undefined') {
+        if (typeof getUserInfosByPhone.getInfos(guestPhone) !== 'undefined') {
           if (getUserInfosByPhone.getInfos(guestPhone).image_path.indexOf('.jpeg') > -1) {
             guessImg = getUserInfosByPhone.getInfos(guestPhone).image_path;
           }
@@ -63,7 +67,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
   });
 
   socket.on('preventSenderGuestArrived', function(phone) {
-    if (typeof(getUserInfosByPhone.getInfos(phone)) !== 'undefined') {
+    if (typeof getUserInfosByPhone.getInfos(phone) !== 'undefined') {
       guest = getUserInfosByPhone.getInfos(phone).displayName;
     }
     else {
@@ -100,7 +104,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         var senderPhone = invitation.data[0].sender_phoneNumber;
 
         var senderImg;
-        if ((typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
+        if ((typeof getUserInfosByPhone.getInfos(senderPhone) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
             if (getUserInfosByPhone.getInfos(senderPhone).image_path.indexOf('.jpeg') > -1) {
               senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
             }
@@ -158,7 +162,8 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
   // le sender met fin a l'invit
   socket.on('senderClosedInvitation', function(invitationId, senderPhoneNumber) {
-      if (typeof(getUserInfosByPhone.getInfos(senderPhoneNumber)) !== 'undefined') {
+    console.log('senderClosedInvitation');
+      if (typeof getUserInfosByPhone.getInfos(senderPhoneNumber) !== 'undefined') {
         guest = getUserInfosByPhone.getInfos(senderPhoneNumber).displayName;
       }
       else {
@@ -183,7 +188,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
   // un invité met fin a l'invit
   socket.on('guestClosedInvitation', function(remainingGuestNumber, invitationId, guestPhoneNumber) {
-    if (typeof(getUserInfosByPhone.getInfos(guestPhoneNumber)) !== 'undefined') {
+    if (typeof getUserInfosByPhone.getInfos(guestPhoneNumber) !== 'undefined') {
       guest = getUserInfosByPhone.getInfos(guestPhoneNumber).displayName;
     }
     else {
@@ -198,7 +203,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     }
 
     // s'il reste des invités qui viennent (qui eux n'ont pas mit fin a l'invitation)
-    if (remainingGuestNumber > 0) {
+    if (remainingGuestNumber > 1) {
       $ionicPopup.alert({
          title: 'Informations',
          template: guest + ' ne vous rejoint désormais plus.',
@@ -225,7 +230,8 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     $rootScope.push.on('notification', function(data) {
         // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
         // SI APP NON LANCEE
-        if (typeof(data.additionalData.invitationId !== 'undefined')) {
+
+        if (typeof data.additionalData.invitationId !== 'undefined') {
           $scope.invitationId = data.additionalData.invitationId;
 
           $http.post(new Ionic.IO.Settings().get('serverUrl') + '/getInvitationInfos',
@@ -244,7 +250,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
               var senderPhone = invitation.data[0].sender_phoneNumber;
 
               var senderImg;
-              if ((typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
+              if ((typeof getUserInfosByPhone.getInfos(senderPhone) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
                 if (getUserInfosByPhone.getInfos(senderPhone).image_path.indexOf('.jpeg') > -1) {
                   senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
                 }
@@ -370,7 +376,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         $scope.bounds.extend($scope.markerLocalisation.position);
 
         // si il y a le marker du sender, c'est qu'on vient depuis la notif
-        if (typeof($scope.markerSender) !== 'undefined') {
+        if (typeof $scope.markerSender !== 'undefined') {
           // donc on fitBounds càd zoom propre en fonction de tous les markers
           map.fitBounds($scope.bounds);
           //affiche la div du bottom pour le choix des moyens de transports
@@ -401,7 +407,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         $scope.responseInvitation = function(state, id_invitation) {
           var invitationId;
 
-          if(typeof(id_invitation) === 'undefined') {
+          if(typeof id_invitation === 'undefined') {
             invitationId = $scope.invitationId;
           }
           else {
@@ -504,7 +510,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
                 var senderPhone = invitation.data[0].sender_phoneNumber;
 
                 var senderImg;
-                if ((typeof(getUserInfosByPhone.getInfos(senderPhone)) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
+                if ((typeof getUserInfosByPhone.getInfos(senderPhone) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
                   if (getUserInfosByPhone.getInfos(senderPhone).image_path.indexOf('.jpeg') > -1) {
                     senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
                   }
@@ -582,7 +588,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
              //donne au sender ma position
              var myPhone = JSON.parse(window.localStorage['user']).phone_number;
              socket.emit('giveGuessPosition', $scope.invitationId, newlatlng, myPhone);
-             if (typeof($scope.validateTransportKind) === 'undefined') {
+             if (typeof $scope.validateTransportKind === 'undefined') {
                $scope.validateTransportKind = "walk";
              }
              $scope.majTransportDuration(newlatlng, $scope.markerSender.position, $scope.validateTransportKind, $scope.invitationId);
@@ -592,35 +598,37 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
      // met fin a une invitation qui a été acceptée
      $scope.stopInvitation = function() {
+       // un invité, donc delete le marker sender + les infos d'itineraire
+       if (typeof $scope.markerSender !== 'undefined') {
+         $scope.emitGuessPosition = false;
+         //remove sender marker
+         $scope.markerSender.setMap(null);
+         // remove directions
+         $scope.directionsDisplay.set('directions', null);
+         // chache la div
+         $scope.showDirection = false;
+         $scope.response = false;
+
+         // prévient le sender que l'invité quitte l'invitation
+         socket.emit('preventSenderInvitationClose', $scope.invitationId, JSON.parse(window.localStorage['user']).phone_number);
+       }
+       else {
+         socket.emit('preventGuestInvitationClose', $scope.invitationId, JSON.parse(window.localStorage['user']).phone_number);
+         // le sender, donc supprime les markers des invités
+         for(var marker in $scope.guestMarker) {
+           $scope.guestMarker[marker].setMap(null);
+           $scope.guestMarker[marker].setVisible(false);
+         }
+       }
+       //socket.emit('leaveRoom', $scope.invitationId);
+       $scope.showClosePendingInvitation = false;
+
        $http.post(new Ionic.IO.Settings().get('serverUrl') + '/closeInvitation',
        {
          invitation_id : $scope.invitationId,
          user_id : JSON.parse(window.localStorage['user']).id_users,
        })
        .then(function successCallback(data) {
-         // un invité, donc delete le marker sender + les infos d'itineraire
-         if (typeof($scope.markerSender) !== 'undefined') {
-           //remove sender marker
-           $scope.markerSender.setMap(null);
-           // remove directions
-           $scope.directionsDisplay.set('directions', null);
-           // chache la div
-           $scope.showDirection = false;
-           $scope.response = false;
-
-           // prévient le sender que l'invité quitte l'invitation
-           socket.emit('preventSenderInvitationClose', $scope.invitationId, JSON.parse(window.localStorage['user']).phone_number);
-         }
-         else {
-           // le sender, donc supprime les markers des invités
-           for(var marker in $scope.guestMarker) {
-             $scope.guestMarker[marker].setMap(null);
-             $scope.guestMarker[marker].setVisible(false);
-           }
-           socket.emit('preventGuestInvitationClose', $scope.invitationId, JSON.parse(window.localStorage['user']).phone_number);
-         }
-         //socket.emit('leaveRoom', $scope.invitationId);
-         $scope.showClosePendingInvitation = false;
 
        }, function errorCallback(err) {
          console.log(err);
