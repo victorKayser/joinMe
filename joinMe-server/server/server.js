@@ -393,7 +393,6 @@ var onStart = function() {
 
         invitation
             .then(function(data){
-                console.log(data);
                 res.json(data);
                 return;
             })
@@ -473,21 +472,44 @@ var onStart = function() {
             res.sendStatus(401);
             return;
         }
-        var finishedInvitation = knex('user_has_invitation')
-            .update({
-                is_finished : 1,
-            })
-            .where('user_id', '=', user_id)
-            .andWhere('invitation_id', '=', invitationId)
+        // check si celui qui met fin a l'invit est un invité ou le sender
+        var checkSenderStatus = knex('invitations')
+            .where('sender_id', '=', user_id)
+            .andWhere('id_invitations', '=', invitationId)
         ;
-        finishedInvitation.bind({})
+        checkSenderStatus.bind({})
             .then(function(result){
-                res.json(result);
+
+                var finishedInvitation = knex('user_has_invitation')
+                    .update({
+                        is_finished : 1,
+                    })
+                    .where('invitation_id', '=', invitationId)
+                ;
+
+                // si result c'est le sender qui met fin a l'invit, donc tous les users auront finished a 1
+                // aucun result, c'est un invité qui souhaite mettre fin a l'invitation
+                if (result.length === 0) {
+                    // on met finished à 1 pour tout les invités
+                    finishedInvitation
+                        .andWhere('user_id', '=', user_id)
+                    ;
+                }
+
+                finishedInvitation.bind({})
+                    .then(function(result){
+                        res.json(result);
+                    })
+                    .catch(function(err){
+                        console.log(err);
+                    })
+                ;
             })
             .catch(function(err){
                 console.log(err);
             })
         ;
+
     });
 
 

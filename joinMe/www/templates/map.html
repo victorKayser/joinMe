@@ -6,7 +6,7 @@
     <i ng-hide="activeTab == 'home'" class="ion-gear-a" ui-sref="settings"></i>
   </ion-nav-buttons>
   <ng-map></ng-map>
-    <button ng-show="showClosePendingInvitation" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
+    <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <div class="infosMap" ng-show="showDirection === true">
       <div class="transport walk" kind='walk' ng-click="changeTransportKind('walk')">
         <i class="ion-android-walk"></i> <span class="transport walk"></span>

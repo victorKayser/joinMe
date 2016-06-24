@@ -37,9 +37,47 @@ var ChatServer = function() {
                 socket.to(tabUser[user]).emit('preventInvitationAppInBackground', invitationId);
             }
         });
+        socket.on('leaveRoom', function(invitationId) {
+            socket.leave(invitationId);
+        });
+
+        socket.on('preventGuestInvitationClose', function(invitationId, senderPhoneNumber) {
+            var userInvited = knex('user_has_invitation')
+                .where('invitation_id', '=', invitationId)
+                .select('user_id')
+            ;
+            userInvited.bind({})
+                .then(function(users){
+                    for(var user in users) {
+                        socket.to(users[user].user_id).emit('senderClosedInvitation', invitationId, senderPhoneNumber);
+                    }
+                    socket.leave(invitationId);
+                })
+                .catch(function(err){
+                    console.log(err);
+                })
+            ;
+        });
+
+        socket.on('preventSenderInvitationClose', function(invitationId, guestPhoneNumber) {
+            var allUserInvited = knex('user_has_invitation')
+                .where('invitation_id', '=', invitationId)
+                .andWhere('is_finished', '=', 0)
+            ;
+            allUserInvited.bind({})
+                .then(function(users){
+                    socket.to(invitationId).emit('guestClosedInvitation', users.length, invitationId, guestPhoneNumber);
+
+                    socket.leave(invitationId);
+                })
+                .catch(function(err){
+                    console.log(err);
+                })
+            ;
+        });
 
         socket.on('giveGuessPosition', function(room, position, phone) {
-            socket.to(room).emit('getGuessPosition', position, phone);
+            socket.to(room).emit('getGuessPosition', position, phone, room);
         });
 
         socket.on('joinPendingInvitationRoom', function(invitations) {
@@ -50,8 +88,6 @@ var ChatServer = function() {
         socket.on('guestArrived', function(invitationId, phone) {
             socket.to(invitationId).emit('preventSenderGuestArrived', phone);
         });
-
-
 
         // notifie le sender quand l'invité accepte l'invitation
         socket.on('guessIsComming', function(room, user_id) {
@@ -65,7 +101,7 @@ var ChatServer = function() {
             ;
             invitation.bind({})
                 .then(function(data){
-                    var argsString = 'guestIsComming ' + data.push_token;
+                    var argsString = 'guestIsComming ' + data[0].push_token;
 
                     // si lancé par gulp, mettre server/, sinon rien
                     runner.exec("php " + "server/" + phpScriptPath + " " +argsString, function(err, phpResponse, stderr) {
