@@ -14,7 +14,7 @@
     // ceux a partir de 3 doivent correspondre à des tokens UNIQUEMENT
     // et les push dans un tableau de token
     foreach ($argv as $key => $value) {
-      if ($key >2){
+      if ($key >3){
         array_push($registrationIds, $value);
       }
     }
@@ -30,14 +30,15 @@
     	'image'	=> 'icon',
       'icon' => 'ic_stat_j',
       'ledColor' => [0, 0, 255, 0],
-      'invitationId' => $argv[2]
+      'invitationId' => $argv[2],
+      'sender_phoneNumber' => $argv[3]
     );
   }
   elseif($argv[1] === "guestIsComming") {
     $title= "A guest is comming !";
     $message = "Click to open";
 
-    array_push($registrationIds, $argv[2]);
+    array_push($registrationIds, $argv[3]);
     // prep the bundle
     $msg = array
     (
@@ -50,7 +51,8 @@
     	'image'	=> 'icon',
       'icon' => 'ic_stat_j',
       'ledColor' => [0, 0, 255, 0],
-      'guestIsComming' => true
+      'guestIsComming' => true,
+      'guestPhone' => $argv[2]
     );
   }
   elseif ($argv[1] === "senderCloseInvitation") {

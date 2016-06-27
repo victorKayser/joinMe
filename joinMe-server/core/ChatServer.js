@@ -117,7 +117,7 @@ var ChatServer = function() {
         });
 
         // notifie le sender quand l'invité accepte l'invitation
-        socket.on('guessIsComming', function(room, user_id) {
+        socket.on('guessIsComming', function(room, user_id, guestPhone) {
 
             var phpScriptPath = config.phpScriptPathPushNotification;
             // obtention du token de push du le sender via l'invitation_id
@@ -128,7 +128,7 @@ var ChatServer = function() {
             ;
             invitation.bind({})
                 .then(function(data){
-                    var argsString = 'guestIsComming ' + data[0].push_token;
+                    var argsString = 'guestIsComming ' + guestPhone + ' ' + data[0].push_token;
 
                     // si lancé par gulp, mettre server/, sinon rien
                     runner.exec("php " + "server/" + phpScriptPath + " " +argsString, function(err, phpResponse, stderr) {

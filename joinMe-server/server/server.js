@@ -320,7 +320,7 @@ var onStart = function() {
                 // prépare les arguments a donner à la commande php pour le fichier d'exéc du push
                 // newInvitation est un intitulé qui servira a établir les messages sur la notif
                 // suivi de l'invitationId
-                var argsString = 'newInvitation ' + invitationId + ' ';
+                var argsString = 'newInvitation ' + invitationId + ' ' + sender_phoneNumber + ' ';
 
                 // prépare la requete pour avoir uniquement les users dont les numéros matchent avec les personnes invitées
                 invitationObject.map(function(contact, key) {

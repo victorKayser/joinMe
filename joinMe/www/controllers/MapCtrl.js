@@ -105,6 +105,18 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     $rootScope.push.on('notification', function(data) {
         // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
         if (typeof data.additionalData.invitationId !== 'undefined') {
+          if (typeof getUserInfosByPhone.getInfos(data.additionalData.sender_phoneNumber) !== 'undefined') {
+            guest = getUserInfosByPhone.getInfos(data.additionalData.sender_phoneNumber).displayName;
+          }
+          else {
+            guest = data.additionalData.sender_phoneNumber;
+          }
+
+          $ionicPopup.alert({
+             title: 'Nouvelle invitation!',
+             template: guest + ' souhaite vous voir!',
+          });
+
           $scope.invitationId = data.additionalData.invitationId;
 
           $http.post(new Ionic.IO.Settings().get('serverUrl') + '/getInvitationInfos',
@@ -242,6 +254,16 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             });
           }
         }
+        // un invité a accepté l'invitation
+        else if(typeof data.additionalData.guestIsComming !== 'undefined') {
+          if (typeof getUserInfosByPhone.getInfos(data.additionalData.guestPhone) !== 'undefined') {
+            guest = getUserInfosByPhone.getInfos(data.additionalData.guestPhone).displayName;
+          }
+          else {
+            guest = data.additionalData.guestPhone;
+          }
+          $cordovaToast.showShortBottom(guest + ' a accepté votre invitation.');
+        }
     });
   }
 
@@ -377,8 +399,9 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             socket.emit('joinInvitationRoom', invitationId);
 
             var user_id = JSON.parse(window.localStorage['user']).id_users;
+            var phone = JSON.parse(window.localStorage['user']).phone_number;
 
-            socket.emit('guessIsComming', invitationId, user_id);
+            socket.emit('guessIsComming', invitationId, user_id, phone);
 
             // variable qui permet au watcher de savoir si il faut donner au sender la position de l'invité
             // active quand l'invitation est acceptée
