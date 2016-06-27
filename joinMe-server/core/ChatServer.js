@@ -32,9 +32,9 @@ var ChatServer = function() {
         socket.on('joinInvitationRoom', function(invitationId) {
             socket.join(invitationId);
         });
-        socket.on('preventSenderInvited', function(tabUser, invitationId) {
+        socket.on('preventSenderInvited', function(tabUser, invitationId, sender_phoneNumber) {
             for (var user in tabUser) {
-                socket.to(tabUser[user]).emit('preventInvitationAppInBackground', invitationId);
+                socket.to(tabUser[user]).emit('preventInvitationAppInBackground', invitationId, sender_phoneNumber);
             }
         });
         socket.on('leaveRoom', function(invitationId) {

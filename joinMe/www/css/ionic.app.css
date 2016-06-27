@@ -9908,3 +9908,17 @@ ng-map {
 .ion-close-round {
   font-size: 25px;
   color: white; }
+
+.recenterOnMe {
+  position: absolute;
+  bottom: 130px;
+  left: 10px;
+  height: 50px;
+  width: 50px;
+  background-color: #bcb1b1;
+  border-radius: 50px;
+  border: none; }
+
+.ion-android-locate {
+  font-size: 25px;
+  color: black; }

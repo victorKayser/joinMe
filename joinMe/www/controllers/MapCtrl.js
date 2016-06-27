@@ -3,6 +3,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
   $scope.guestMarker = [];
+  $scope.bounds = new google.maps.LatLngBounds();
 
   // variables tache de fond ou pas pour ne pas recevoir quand app en background les positions des invités
   // revient de tache de fond
@@ -81,6 +82,14 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     }
   });
 
+  // lorsque l'on recoit une invitationet que l'appli et en tache de fond (du coup quand on ne click pas sur la notif)
+  socket.on('preventInvitationAppInBackground', function(invitationId, sender_phoneNumber) {
+    if ($scope.onBackground) {
+      getInvitation(invitationId, sender_phoneNumber);
+      $scope.alreadyGetInvitation = invitationId;
+    }
+  });
+
   socket.on('preventSenderGuestArrived', function(phone) {
     if (typeof getUserInfosByPhone.getInfos(phone) !== 'undefined') {
       guest = getUserInfosByPhone.getInfos(phone).displayName;
@@ -98,98 +107,107 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     $scope.showClosePendingInvitation = false;
   });
 
-  $scope.bounds = new google.maps.LatLngBounds();
+  // scope d'obtention d'invit a accepter ou refuser : appelé à la notif et au socket
+  // au socket également car si on est invité et qu'on clique par sur la notif alors on ne voit jamais l'invitation
+  var getInvitation = function(invitationId, senderPhone) {
+    console.log('getInvitation');
+    $scope.stopRecenterOnMyPosition = true;
+    if (typeof getUserInfosByPhone.getInfos(senderPhone) !== 'undefined') {
+      guest = getUserInfosByPhone.getInfos(senderPhone).displayName;
+    }
+    else {
+      guest = senderPhone;
+    }
+
+    $ionicPopup.alert({
+       title: 'Nouvelle invitation!',
+       template: guest + ' souhaite vous voir!',
+    });
+
+    $scope.invitationId = invitationId;
+
+    $http.post(new Ionic.IO.Settings().get('serverUrl') + '/getInvitationInfos',
+    {
+      invitation_id : invitationId,
+      user_id : JSON.parse(window.localStorage['user']).id_users,
+    })
+    .then(function successCallback(invitation) {
+      // si l'invitation est toujours actuelle
+      if (invitation.data.length > 0) {
+        var sender_position = invitation.data[0].sender_position;
+
+        var senderLat = parseFloat(sender_position.split(', ')[0]);
+        var senderLng = parseFloat(sender_position.split(', ')[1]);
+
+        var senderPhone = invitation.data[0].sender_phoneNumber;
+
+        var senderImg;
+        if ((typeof getUserInfosByPhone.getInfos(senderPhone) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
+          if (getUserInfosByPhone.getInfos(senderPhone).image_path.indexOf('.jpeg') > -1) {
+            senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
+          }
+          else {
+            senderImg = "img/marker-user.png";
+          }
+        }
+        else {
+          senderImg = "img/marker-user.png";
+        }
+
+        $scope.emojiPath = invitation.data[0].emoji_path;
+
+        NgMap.getMap().then(function(map) {
+          // crée le marker du sender
+          $scope.markerSender = new google.maps.Marker({
+             position: {lat: senderLat, lng: senderLng},
+             map: map,
+             title: 'test',
+             draggable: false,
+             icon: {
+               url : senderImg,
+               scaledSize: new google.maps.Size(20, 20)
+             }
+          });
+          // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
+          $scope.bounds.extend($scope.markerSender.position);
+
+          // donc on fitBounds càd zoom propre en fonction de tous les markers
+          map.fitBounds($scope.bounds);
+          //affiche la div du bottom pour le choix des moyens de transports
+          $scope.showDirection = true;
+
+          $scope.emitGuessPosition = false;
+
+          $cordovaGeolocation.getCurrentPosition().then(function(position){
+             var lat = position.coords.latitude;
+             var lng = position.coords.longitude;
+
+             // trace itinéraire piéton par défaut + temps de voyage
+             $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.WALKING, "walk");
+             angular.element(document.querySelectorAll('div.transport')).removeClass('selected');
+             angular.element(document.querySelectorAll('div.walk')).addClass('selected');
+          });
+        });
+      }
+      //invitation terminée
+      else {
+
+      }
+    }
+    , function errorCallback(err) {
+      console.log(err);
+    });
+  }
+
 
   if(!new Ionic.IO.Settings().get('isPC')) {
 
     $rootScope.push.on('notification', function(data) {
         // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
         if (typeof data.additionalData.invitationId !== 'undefined') {
-          if (typeof getUserInfosByPhone.getInfos(data.additionalData.sender_phoneNumber) !== 'undefined') {
-            guest = getUserInfosByPhone.getInfos(data.additionalData.sender_phoneNumber).displayName;
+          if (parseFloat($scope.alreadyGetInvitation) !== parseFloat(data.additionalData.invitationId)) {
+            getInvitation(data.additionalData.invitationId, data.additionalData.sender_phoneNumber);
           }
-          else {
-            guest = data.additionalData.sender_phoneNumber;
-          }
-
-          $ionicPopup.alert({
-             title: 'Nouvelle invitation!',
-             template: guest + ' souhaite vous voir!',
-          });
-
-          $scope.invitationId = data.additionalData.invitationId;
-
-          $http.post(new Ionic.IO.Settings().get('serverUrl') + '/getInvitationInfos',
-          {
-            invitation_id : data.additionalData.invitationId,
-            user_id : JSON.parse(window.localStorage['user']).id_users,
-          })
-          .then(function successCallback(invitation) {
-            // si l'invitation est toujours actuelle
-            if (invitation.data.length > 0) {
-              var sender_position = invitation.data[0].sender_position;
-
-              var senderLat = parseFloat(sender_position.split(', ')[0]);
-              var senderLng = parseFloat(sender_position.split(', ')[1]);
-
-              var senderPhone = invitation.data[0].sender_phoneNumber;
-
-              var senderImg;
-              if ((typeof getUserInfosByPhone.getInfos(senderPhone) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
-                if (getUserInfosByPhone.getInfos(senderPhone).image_path.indexOf('.jpeg') > -1) {
-                  senderImg = getUserInfosByPhone.getInfos(senderPhone).image_path;
-                }
-                else {
-                  senderImg = "img/marker-user.png";
-                }
-              }
-              else {
-                senderImg = "img/marker-user.png";
-              }
-
-              $scope.emojiPath = invitation.data[0].emoji_path;
-
-              NgMap.getMap().then(function(map) {
-                // crée le marker du sender
-                $scope.markerSender = new google.maps.Marker({
-                   position: {lat: senderLat, lng: senderLng},
-                   map: map,
-                   title: 'test',
-                   draggable: false,
-                   icon: {
-                     url : senderImg,
-                     scaledSize: new google.maps.Size(20, 20)
-                   }
-                });
-                // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
-                $scope.bounds.extend($scope.markerSender.position);
-
-                // donc on fitBounds càd zoom propre en fonction de tous les markers
-                map.fitBounds($scope.bounds);
-                //affiche la div du bottom pour le choix des moyens de transports
-                $scope.showDirection = true;
-
-                $scope.emitGuessPosition = false;
-
-                $cordovaGeolocation.getCurrentPosition().then(function(position){
-                   var lat = position.coords.latitude;
-                   var lng = position.coords.longitude;
-
-                   // trace itinéraire piéton par défaut + temps de voyage
-                   $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.WALKING, "walk");
-                   angular.element(document.querySelectorAll('div.transport')).removeClass('selected');
-                   angular.element(document.querySelectorAll('div.walk')).addClass('selected');
-                });
-              });
-            }
-            //invitation terminée
-            else {
-
-            }
-          }
-          , function errorCallback(err) {
-            console.log(err);
-          });
         }
         // invitation terminée a l'inivitative du sender
         else if(typeof data.additionalData.senderCloseInvitation !== 'undefined') {
@@ -279,19 +297,32 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     $scope.service = new google.maps.DistanceMatrixService();
     $scope.directionsDisplay.setMap(map);
 
+    // évenement de map lorsqu'on drag (swipe sur la map pour change la direction)
+    map.addListener('drag', function() {
+      $scope.stopRecenterOnMyPosition = true;
+    });
+
+    $scope.recenterOnMe = function() {
+      if ((typeof $scope.myLat !== 'undefined') && (typeof $scope.myLng !== 'undefined')) {
+        $scope.map.panTo(
+           new google.maps.LatLng($scope.myLat, $scope.myLng)
+        );
+        $scope.stopRecenterOnMyPosition = false;
+      }
+    };
 
     // check in LS if old position are saved
     if (window.localStorage['lastPosition']) {
       var lastPosition = JSON.parse(window.localStorage['lastPosition'] || '{}');
       //init the center on the old pos
-      $scope.map.setCenter(
+      $scope.map.panTo(
          new google.maps.LatLng(lastPosition.split(', ')[0], lastPosition.split(', ')[1])
       );
     }
     else {
       $scope.map.setZoom(11);
       // init in Paris
-      $scope.map.setCenter(
+      $scope.map.panTo(
          new google.maps.LatLng('48.8575954','2.3609439')
       );
     }
@@ -301,7 +332,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
        var lng = position.coords.longitude;
 
        // init the center on the position
-       $scope.map.setCenter(
+       $scope.map.panTo(
           new google.maps.LatLng(lat, lng)
        );
        // zoom
@@ -313,13 +344,12 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           title: 'test',
           draggable: false,
           icon: {
-            path : google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-            fillColor: '#00b6ff',
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: '#ccc9c9',
-            scale: 8,
-            rotation: 180,
+            path : google.maps.SymbolPath.FORWARD_OPEN_ARROW,
+            // fillColor: '#00b6ff',
+            // fillOpacity: 1,
+            strokeWeight: 3,
+            strokeColor: '#0c60ee',
+            scale: 5,
           }
         });
 
@@ -385,7 +415,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             invitationId = id_invitation;
           }
           // recentre sur la personne
-          $scope.map.setCenter(
+          $scope.map.panTo(
              new google.maps.LatLng(lat, lng)
           );
           // param pour hide les boutons de choix
@@ -394,6 +424,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           //accept
           if (state) {
             // zoom
+            $scope.stopRecenterOnMyPosition = false;
             $scope.map.setZoom(17);
             //avec l'id de la nouvelle invitation, on fait rejoindre l'invité dans la socket room de cet id ou se situe le sender
             socket.emit('joinInvitationRoom', invitationId);
@@ -418,6 +449,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           }
           //refuse
           else {
+            $scope.stopRecenterOnMyPosition = false;
             //remove sender marker
             $scope.markerSender.setMap(null);
             // remove directions
@@ -540,14 +572,15 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
          }, function (position) {
            // for each new position
-           var lat = position.coords.latitude;
-           var lng = position.coords.longitude;
-           var positionLS = lat + ', ' + lng;
+           $scope.myLat = position.coords.latitude;
+           $scope.myLng = position.coords.longitude;
+           var positionLS = $scope.myLat + ', ' + $scope.myLng;
            // center the map
-           $scope.map.setCenter(
-              new google.maps.LatLng(lat, lng)
-           );
-
+           if (!$scope.stopRecenterOnMyPosition) {
+             $scope.map.panTo(
+                new google.maps.LatLng($scope.myLat, $scope.myLng)
+             );
+           }
            // set on LS the new position
            window.localStorage['lastPosition'] = JSON.stringify(positionLS);
 

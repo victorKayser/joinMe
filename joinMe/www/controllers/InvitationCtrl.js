@@ -101,6 +101,7 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
             $state.go('map');
             //avec l'id de la nouvelle invitation, on fait rejoindre le sender dans la socket room de cet id
             socket.emit('joinInvitationRoom', data.data.invitationId);
+            socket.emit('preventSenderInvited', data.data.tabUserId, data.data.invitationId, sender_phoneNumber);
             $cordovaToast.showShortBottom('Invitation sended...');
          }
          , function errorCallback(err) {
