@@ -558,7 +558,20 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
            if ($scope.emitGuessPosition) {
              //donne au sender ma position
              var myPhone = JSON.parse(window.localStorage['user']).phone_number;
-             socket.emit('giveGuessPosition', $scope.invitationId, newlatlng, myPhone);
+
+             // émet au sender la position a minimum x secondes d'interval (pour éviter de l'envoyer trop)
+
+             $scope.now = new Date();
+
+             if (!$scope.lastEmit) {
+               socket.emit('giveGuessPosition', $scope.invitationId, newlatlng, myPhone);
+               $scope.lastEmit = new Date();
+             }
+             if ( ($scope.lastEmit) && ( (($scope.now - $scope.lastEmit) / 1000) >= 3) ) {
+               socket.emit('giveGuessPosition', $scope.invitationId, newlatlng, myPhone);
+               $scope.lastEmit = new Date();
+             }
+
              if (typeof $scope.validateTransportKind === 'undefined') {
                $scope.validateTransportKind = "walk";
              }
