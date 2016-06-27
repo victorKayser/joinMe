@@ -58,7 +58,7 @@
     $message = "Click to open";
 
     foreach ($argv as $key => $value) {
-      if ($key >1){
+      if ($key >3){
         array_push($registrationIds, $value);
       }
     }
@@ -74,15 +74,17 @@
     	'image'	=> 'icon',
       'icon' => 'ic_stat_j',
       'ledColor' => [0, 0, 255, 0],
-      'guestIsComming' => true
+      'senderCloseInvitation' => true,
+      'senderPhoneNumber' => $argv[2],
+      'leavedInvitation' => $argv[3]
     );
   }
   elseif ($argv[1] === "guestCloseInvitation") {
     $title= "A guest is leaving the invitation";
     $message = "Click to open";
 
-    array_push($registrationIds, $argv[2]);
-    
+    array_push($registrationIds, $argv[5]);
+
     // prep the bundle
     $msg = array
     (
@@ -95,7 +97,10 @@
     	'image'	=> 'icon',
       'icon' => 'ic_stat_j',
       'ledColor' => [0, 0, 255, 0],
-      'guestIsComming' => true
+      'guestCloseInvitation' => true,
+      'guestPhoneNumber' => $argv[2],
+      'remainingGuestNumber' => $argv[3],
+      'leavedInvitation' => $argv[4]
     );
   }
 

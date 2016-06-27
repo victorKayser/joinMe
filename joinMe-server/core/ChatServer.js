@@ -44,7 +44,7 @@ var ChatServer = function() {
         socket.on('preventGuestInvitationClose', function(invitationId, senderPhoneNumber) {
             socket.leave(invitationId);
             var phpScriptPath = config.phpScriptPathPushNotification;
-            var argsString = 'senderCloseInvitation ';
+            var argsString = 'senderCloseInvitation ' + senderPhoneNumber + ' ' + invitationId + ' ';
 
             var userInvited = knex('user_has_invitation')
                 .join('users', 'users.id_users', '=', 'user_has_invitation.user_id')
@@ -53,7 +53,6 @@ var ChatServer = function() {
             userInvited.bind({})
                 .then(function(users){
                     for(var user in users) {
-                        socket.to(users[user].user_id).emit('senderClosedInvitation', invitationId, senderPhoneNumber);
                         argsString = argsString + users[user].push_token + ' ';
                     }
                     runner.exec("php " + "server/" + phpScriptPath + " " +argsString, function(err, phpResponse, stderr) {
@@ -69,9 +68,9 @@ var ChatServer = function() {
         });
 
         socket.on('preventSenderInvitationClose', function(invitationId, guestPhoneNumber) {
-
+            socket.leave(invitationId);
             var phpScriptPath = config.phpScriptPathPushNotification;
-            var argsString = 'guestCloseInvitation ';
+            var argsString = 'guestCloseInvitation ' + guestPhoneNumber + ' ';
 
             var allUserInvited = knex('user_has_invitation')
                 .where('invitation_id', '=', invitationId)
@@ -79,9 +78,6 @@ var ChatServer = function() {
             ;
             allUserInvited.bind({})
                 .then(function(users){
-                    socket.to(invitationId).emit('guestClosedInvitation', users.length, invitationId, guestPhoneNumber);
-                    socket.leave(invitationId);
-
                     var getSenderToken = knex('invitations')
                         .join('users', 'users.id_users', '=', 'invitations.sender_id')
                         .where('invitations.id_invitations', '=', invitationId)
@@ -89,12 +85,11 @@ var ChatServer = function() {
                     ;
                     getSenderToken.bind({})
                         .then(function(sender){
-                            argsString = argsString + sender[0].push_token;
+                            argsString = argsString + users.length + ' ' + invitationId + ' ' + sender[0].push_token;
                             runner.exec("php " + "server/" + phpScriptPath + " " +argsString, function(err, phpResponse, stderr) {
                                 if(err) {
                                     console.log(err);
                                 }
-                                socket.leave(invitationId);
                             });
                         })
                         .catch(function(err){
