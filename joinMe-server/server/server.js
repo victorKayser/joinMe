@@ -444,12 +444,13 @@ var onStart = function() {
             .join('user_has_invitation', 'invitations.id_invitations', '=', 'user_has_invitation.invitation_id')
             .where('user_has_invitation.user_id', '=', user_id)
             .andWhere('user_has_invitation.is_finished', '=', 0)
-            .andWhere('user_has_invitation.accepted', '=', 1)
+            .andWhere('user_has_invitation.refused', '=', 0)
+            //.andWhere('user_has_invitation.accepted', '=', 1)
         ;
         invitations.bind({})
             .then(function(data){
                 var goodData = [];
-                var now = moment().format('YYYY-MM-DD hh:mm:ss');
+                var now = moment().format('YYYY-MM-DD HH:mm:ss');
                 data.map(function(invitation){
                     var date = moment(invitation.date);
                     var diff = moment(now).diff(date, 'hours');

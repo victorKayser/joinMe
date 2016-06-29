@@ -42,6 +42,7 @@ var ChatServer = function() {
         });
 
         socket.on('preventGuestInvitationClose', function(invitationId, senderPhoneNumber) {
+            socket.to(invitationId).emit('invitationClosedBySender', senderPhoneNumber, invitationId);
             socket.leave(invitationId);
             var phpScriptPath = config.phpScriptPathPushNotification;
             var argsString = 'senderCloseInvitation ' + senderPhoneNumber + ' ' + invitationId + ' ';
@@ -68,6 +69,7 @@ var ChatServer = function() {
         });
 
         socket.on('preventSenderInvitationClose', function(invitationId, guestPhoneNumber) {
+
             socket.leave(invitationId);
             var phpScriptPath = config.phpScriptPathPushNotification;
             var argsString = 'guestCloseInvitation ' + guestPhoneNumber + ' ';
@@ -78,6 +80,7 @@ var ChatServer = function() {
             ;
             allUserInvited.bind({})
                 .then(function(users){
+                    socket.to(invitationId).emit('invitationClosedByGuest', guestPhoneNumber, users.length, invitationId);
                     var getSenderToken = knex('invitations')
                         .join('users', 'users.id_users', '=', 'invitations.sender_id')
                         .where('invitations.id_invitations', '=', invitationId)
@@ -109,6 +112,7 @@ var ChatServer = function() {
 
         socket.on('joinPendingInvitationRoom', function(invitations) {
             for (var invitation in invitations) {
+                console.log('join' + invitations[invitation].id_invitation);
                 socket.join(invitations[invitation].id_invitations);
             }
         });
@@ -157,9 +161,26 @@ var ChatServer = function() {
                 .catch(function(err){
                     console.log(err);
                 })
-
         });
 
+        // l'invité refuse l'invitation
+        socket.on('guestRefused', function(room, user_id) {
+            // mentionne en bdd que l'invitation est acceptée par l'utilisateur invité
+            var invitationRefused = knex('user_has_invitation')
+                .where('user_id', '=', user_id)
+                .andWhere('invitation_id', '=', room)
+                .update({
+                    refused : 1,
+                })
+            ;
+            invitationRefused.bind({})
+                .then(function(data){
+                })
+                .catch(function(err){
+                    console.log(err);
+                })
+            ;
+        });
     });
     this.server = server;
 };
