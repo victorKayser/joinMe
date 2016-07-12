@@ -9732,16 +9732,16 @@ a.button {
   transition-duration: 0s; }
 
 ng-map {
-  height: 80%;
+  height: 100%;
   margin-top: 44px; }
 
 .infosMap {
-  position: relative;
-  height: 20%;
+  height: 15%;
+  background-color: rgba(12, 96, 238, 0.4);
   width: 100%;
   padding-top: 3px;
   position: absolute;
-  bottom: -7%; }
+  bottom: 0%; }
 
 .transport {
   height: 25px;
@@ -9770,11 +9770,6 @@ ng-map {
   top: 5px;
   margin-right: 17%; }
 
-.containerBtn {
-  width: 100%;
-  text-align: center;
-  margin-top: 5%; }
-
 .transport > i,
 .accept > i,
 .refuse > i {
@@ -9783,13 +9778,33 @@ ng-map {
 .container-view {
   margin-top: 50px; }
 
-.button.joinMeNow {
-  margin: 0;
-  padding: 0;
-  font-size: 19px;
+.containerBtn {
   width: 100%;
   position: absolute;
-  bottom: 0; }
+  bottom: 0;
+  text-align: center;
+  margin-top: 5%; }
+
+.button.joinmeBtn {
+  margin: 0;
+  padding: 0;
+  font-size: 9px;
+  font-weight: bold;
+  border-radius: 50px;
+  border: solid 2px;
+  position: absolute;
+  top: 175px;
+  left: 10px;
+  height: 50px;
+  width: 50px; }
+
+.joinMeNow {
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+  font-size: 14px;
+  margin-left: auto;
+  margin-right: auto; }
 
 .emoji {
   overflow: scroll;
@@ -9897,8 +9912,8 @@ ng-map {
 
 .closePendingInvitation {
   position: absolute;
-  top: 60px;
-  right: 15px;
+  top: 235px;
+  left: 10px;
   width: 50px;
   height: 50px;
   background-color: #ff5000;
@@ -9906,18 +9921,17 @@ ng-map {
   border: none; }
 
 .ion-close-round {
-  font-size: 25px;
-  color: white; }
+  font-size: 25px; }
 
 .recenterOnMe {
   position: absolute;
-  bottom: 130px;
+  top: 115px;
   left: 10px;
   height: 50px;
   width: 50px;
-  background-color: #bcb1b1;
+  background-color: white;
   border-radius: 50px;
-  border: none; }
+  border: solid 1px gray; }
 
 .ion-android-locate {
   font-size: 25px;

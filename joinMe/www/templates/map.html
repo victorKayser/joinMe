@@ -8,7 +8,9 @@
   <ng-map></ng-map>
     <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><i class="ion-android-locate"></i></button>
-    <div class="infosMap" ng-show="showDirection === true">
+    <a ng-hide="showDirection === true" ui-sref="invitation"><button class="button button-outline button-positive joinmeBtn">Join Me!</button></a>
+
+    <div class="infosMap" ng-show="showDirection !== true">
       <div class="transport walk" kind='walk' ng-click="changeTransportKind('walk')">
         <i class="ion-android-walk"></i> <span class="transport walk"></span>
       </div>
@@ -27,10 +29,5 @@
       <div class="refuse" ng-hide="response === true" ng-click="responseInvitation(false)">
         <i class="ion-close-round"></i> Refuse
       </div>
-    </div>
-    <div ng-hide="showDirection === true" class="containerBtn">
-      <a ui-sref="invitation">
-        <button class="button button-outline button-positive joinmeBtn">Join Me!</button
-      </a>
     </div>
 </ion-view>
