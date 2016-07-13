@@ -8,9 +8,14 @@
   <ng-map></ng-map>
     <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><i class="ion-android-locate"></i></button>
-    <a ng-hide="showDirection === true" ui-sref="invitation"><button class="button button-outline button-positive joinmeBtn">Join Me!</button></a>
+    <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="button button-outline button-positive joinmeBtn">Join Me!</button></a>
 
-    <div class="infosMap" ng-show="showDirection !== true">
+    <input id="pac-input" class="adressInput" type="text" ng-model="address" ng-blur="updateAddress()" ng-focus="disableTap()">
+    <div class="bloc-address">
+      <button ng-click="resetInputAddress()" type="deleteInput" class="deleteInput" name="button"><i class="ion-ios-close-empty"></i></button>
+    </div>
+
+    <div class="infosMap" ng-show="showDirection === true">
       <div class="transport walk" kind='walk' ng-click="changeTransportKind('walk')">
         <i class="ion-android-walk"></i> <span class="transport walk"></span>
       </div>

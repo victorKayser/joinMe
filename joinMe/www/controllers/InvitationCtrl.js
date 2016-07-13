@@ -91,7 +91,7 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
          {
            id : user_id,
            invitationObject: $scope.invitationToContact,
-           position : JSON.parse(window.localStorage['lastPosition']),
+           position : JSON.parse(window.localStorage['invitationPosition']),
            emoji: $scope.selectedEmoji,
            sender_phoneNumber : sender_phoneNumber,
 

@@ -257,3 +257,44 @@ ng-map {
   font-size: 25px;
   color: black;
 }
+
+#pac-input.adressInput {
+
+  position: relative;
+  width: 95%;
+  margin-left: 2.5%;
+  border: 1px solid transparent;
+  border-radius: 2px 0 0 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+
+  padding: 0 25px 0 13px;
+  text-overflow: ellipsis;
+  margin-top: 10px;
+}
+
+.bloc-address {
+  position: absolute;
+    top: 57px;
+  width: 5%;
+  margin-left: 92.5%;
+  height: 32px;
+}
+
+.deleteInput {
+  font-size: 20px;
+  height: 5px;
+  margin-right: 5px;
+  margin-bottom: 3px;
+  background-color: #fff;
+  border : none;
+  float: right;
+}

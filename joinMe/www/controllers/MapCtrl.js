@@ -5,6 +5,36 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
   $scope.guestMarker = [];
   $scope.bounds = new google.maps.LatLngBounds();
   $scope.leavedGuest = [];
+  $scope.address = '';
+
+  // hack pour utiliser l'autocomplésion sur mobile
+  $scope.disableTap = function(){
+    container = document.getElementsByClassName('pac-container');
+    // disable ionic data tab
+    angular.element(container).attr('data-tap-disabled', 'true');
+    // leave input field if google-address-entry is selected
+    angular.element(container).on("click", function(){
+        document.getElementById('searchBar').blur();
+    });
+  };
+
+  $scope.resetInputAddress = function() {
+    $('#pac-input').val('');
+    $scope.markerLocalisationDraggable.setPosition(new google.maps.LatLng($scope.myLat, $scope.myLng));
+    $scope.map.panTo(
+       new google.maps.LatLng($scope.myLat, $scope.myLng)
+    );
+    $scope.dragedMarker = false;
+  }
+
+  //event click join me button
+  $scope.storePositionInvitation = function() {
+    var lat = $scope.markerLocalisationDraggable.getPosition().lat();
+    var lng = $scope.markerLocalisationDraggable.getPosition().lng();
+    var posLs = lat + ', ' + lng;
+    window.localStorage['invitationPosition'] = JSON.stringify(posLs);
+    $state.go('invitation');
+  };
 
   // variables tache de fond ou pas pour ne pas recevoir quand app en background les positions des invités
   // revient de tache de fond
@@ -454,9 +484,9 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
            new google.maps.LatLng($scope.myLat, $scope.myLng)
         );
         $scope.stopRecenterOnMyPosition = false;
+        $scope.map.setZoom(16);
       }
     };
-
     // check in LS if old position are saved
     if (window.localStorage['lastPosition']) {
       var lastPosition = JSON.parse(window.localStorage['lastPosition'] || '{}');
@@ -477,6 +507,25 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
        var lat = position.coords.latitude;
        var lng = position.coords.longitude;
 
+       // lors de la position captée, on met l'adresse de la personne dans la bar du dessus
+       geocoder = new google.maps.Geocoder();
+       geocoder.geocode
+        ({
+            latLng: new google.maps.LatLng(lat, lng)
+        },
+            function(results, status)
+            {
+                if (status == google.maps.GeocoderStatus.OK)
+                {
+                    $scope.address = results[0].formatted_address;
+                    $scope.$apply();
+                }
+                else
+                {
+                }
+            }
+        );
+
        // init the center on the position
        $scope.map.panTo(
           new google.maps.LatLng(lat, lng)
@@ -496,6 +545,77 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             strokeWeight: 3,
             strokeColor: '#0c60ee',
             scale: 5,
+          }
+        });
+
+        //init the draggable marker for invitation
+        $scope.markerLocalisationDraggable = new google.maps.Marker({
+           position: {lat: lat, lng: lng},
+           map: map,
+           title: 'draggable marker',
+           draggable: true,
+           icon: {
+             url : 'img/marker.png',
+             scaledSize: new google.maps.Size(30, 30)
+           }
+        });
+
+        $scope.bounds.extend($scope.markerLocalisation.position);
+        $scope.bounds.extend($scope.markerLocalisationDraggable.position);
+
+        // quand on drag le marker on met a jour l'adresse
+        google.maps.event.addListener($scope.markerLocalisationDraggable, 'dragend', function(res) {
+          $scope.dragedMarker = true;
+
+           geocoder = new google.maps.Geocoder();
+           geocoder.geocode
+            ({
+                latLng: $scope.markerLocalisationDraggable.getPosition()
+            },
+                function(results, status)
+                {
+                    if (status == google.maps.GeocoderStatus.OK)
+                    {
+                        $scope.address = results[0].formatted_address;
+                        $scope.$apply();
+                    }
+                    else
+                    {
+                    }
+                }
+            );
+        });
+
+        // gestion de l'autocomplétion de la bar de recherche d'adresse
+        var input = document.getElementById('pac-input');
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        autocomplete.addListener('place_changed', function() {
+          var place = autocomplete.getPlace();
+          $scope.markerLocalisationDraggable.setPosition(place.geometry.location);
+          $scope.bounds.extend($scope.markerLocalisationDraggable.position);
+          $scope.stopRecenterOnMyPosition = true;
+          $scope.dragedMarker = true;
+
+          if (!place.geometry) {
+            window.alert("Autocomplete's returned place contains no geometry");
+            return;
+          }
+
+          // If the place has a geometry, then present it on a map.
+          if (place.geometry.viewport) {
+            map.fitBounds($scope.bounds);
+          } else {
+          }
+
+          var address = '';
+          if (place.address_components) {
+            address = [
+              (place.address_components[0] && place.address_components[0].short_name || ''),
+              (place.address_components[1] && place.address_components[1].short_name || ''),
+              (place.address_components[2] && place.address_components[2].short_name || '')
+            ].join(' ');
           }
         });
 
@@ -521,6 +641,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           $state.go('invitation');
         });
         $scope.bounds.extend($scope.markerLocalisation.position);
+        $scope.bounds.extend($scope.markerLocalisationDraggable.position);
 
         // si il y a le marker du sender, c'est qu'on vient depuis la notif
         if (typeof $scope.markerSender !== 'undefined') {
@@ -663,6 +784,10 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
            // modify the position of the marker
            var newlatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
            $scope.markerLocalisation.setPosition(newlatlng);
+
+           if (!$scope.dragedMarker) {
+             $scope.markerLocalisationDraggable.setPosition(newlatlng);
+           }
 
            if ($scope.emitGuessPosition) {
              //donne au sender ma position
