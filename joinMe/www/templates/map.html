@@ -1,21 +1,30 @@
-<ion-view hide-back-button="true" view-title="JoinMe">
-  <ion-nav-buttons side="left">
-    <button ng-hide="activeTab == 'home'" class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
-  </ion-nav-buttons>
+<ion-view hide-back-button="true" hide-nav-bar="true" view-title="JoinMe">
   <ion-nav-buttons side="right">
     <i ng-hide="activeTab == 'home'" class="ion-gear-a" ui-sref="settings"></i>
   </ion-nav-buttons>
   <ng-map></ng-map>
     <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><i class="ion-android-locate"></i></button>
-    <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="button button-outline button-positive joinmeBtn">Join Me!</button></a>
+    <div class="containerJoinMeBtn">
+      <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="button button-outline joinmeBtn">Join Me</button></a>
+    </div>
 
     <input id="pac-input" class="adressInput" type="text" ng-model="address" ng-blur="updateAddress()" ng-focus="disableTap()">
     <div class="bloc-address">
       <button ng-click="resetInputAddress()" type="deleteInput" class="deleteInput" name="button"><i class="ion-ios-close-empty"></i></button>
     </div>
 
-    <div class="infosMap" ng-show="showDirection === true">
+    <div class="infosMap" on-swipe-down="gestureInfosMap()">
+      <div class="chevronInfosBar" on-swipe-up="gestureInfosMap()" ng-click="gestureInfosMap()">
+        <div class="emojiInvitation">
+            <img src="img/emoji/{{emojiPath}}" alt="" />
+        </div>
+        <div class="senderName">
+          {{senderName}}
+        </div>
+        <span class="duration"></span>
+        <i class="ion-chevron-down"></i>
+      </div>
       <div class="transport walk" kind='walk' ng-click="changeTransportKind('walk')">
         <i class="ion-android-walk"></i> <span class="transport walk"></span>
       </div>
@@ -25,14 +34,29 @@
       <div class="transport car" kind="car" ng-click="changeTransportKind('car')">
         <i class="ion-android-car"></i> <span class="transport car"></span>
       </div>
-      <div class="emojiInvitation">
-          <img src="img/emoji/{{emojiPath}}" alt="" />
-      </div>
       <div class="accept" ng-hide="response === true" ng-click="responseInvitation(true)">
-        <i class="ion-checkmark-round"></i> Join
+        <i class="ion-checkmark-round"></i>
       </div>
       <div class="refuse" ng-hide="response === true" ng-click="responseInvitation(false)">
-        <i class="ion-close-round"></i> Refuse
+        <i class="ion-close-round"></i>
       </div>
+
+      <div ng-hide="showClosePendingInvitation" class="phraseRejoindre">
+        {{senderName}} se situe à<span class="duration"></span>,</br> le rejoindre  pour <div class="emojiInvitation">
+            <img src="img/emoji/{{emojiPath}}" alt="" />
+        </div> ?
+      </div>
+
+      <div ng-show="showClosePendingInvitation" class="phraseRejoindreAccepted">
+        <div class="emojiInvitation">
+            <img src="img/emoji/{{emojiPath}}" alt="" />
+        </div>
+      </br>
+        <span class="senderName">{{senderName}}</span>
+      </br>
+        <span class="duration"></span>
+      </div>
+      <i ng-click="gestureInfosMap()" class="chevron ion-chevron-down"></i>
     </div>
+    <button ng-hide="activeTab == 'home'" ng-click="rotateHamburger()" class="hamburgerIcon button button-icon ion-navicon" menu-toggle="left"></button>
 </ion-view>

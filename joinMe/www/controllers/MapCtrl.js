@@ -1,4 +1,4 @@
-starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $timeout, $ionicPopup, $ionicPlatform) {
+starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $timeout, $ionicPopup, $ionicPlatform, $ionicSideMenuDelegate) {
   //arrivée sur l'appli
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
@@ -6,6 +6,8 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
   $scope.bounds = new google.maps.LatLngBounds();
   $scope.leavedGuest = [];
   $scope.address = '';
+
+  $ionicSideMenuDelegate.canDragContent(false);
 
   // hack pour utiliser l'autocomplésion sur mobile
   $scope.disableTap = function(){
@@ -35,6 +37,44 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     window.localStorage['invitationPosition'] = JSON.stringify(posLs);
     $state.go('invitation');
   };
+
+  $scope.gestureInfosMap = function() {
+    $('.ion-chevron-down').css('display', 'none');
+    $timeout(function(){
+      $('.ion-chevron-down').css('display', 'block');
+    }, 300);
+    if ($('.infosMap').hasClass('hideInfosMap')) {
+      $('.infosMap').removeClass('hideInfosMap');
+      $('.chevronInfosBar').removeClass('hideBandeau');
+    }
+    else {
+      $('.infosMap').addClass('hideInfosMap');
+      $('.chevronInfosBar').addClass('hideBandeau');
+    }
+
+  }
+
+  $scope.rotateHamburger = function() {
+    if ($('.hamburgerIcon').hasClass('rotateHamburger')) {
+      $('.hamburgerIcon').removeClass('rotateHamburger');
+    }
+    else {
+      $scope.animateHamburger = true;
+      $('.hamburgerIcon').addClass('rotateHamburger');
+    }
+  }
+
+  // animer le menu icon quand on ferme le menu
+  $scope.$watch(function () {
+    return $ionicSideMenuDelegate.isOpen();
+  },
+     function (isOpen) {
+    if (!isOpen){
+      if($scope.animateHamburger) {
+        $('.hamburgerIcon').removeClass('rotateHamburger');
+      }
+    }
+  });
 
   // variables tache de fond ou pas pour ne pas recevoir quand app en background les positions des invités
   // revient de tache de fond
@@ -200,14 +240,10 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         else {
           senderImg = "img/marker-user.png";
         }
-
-        $ionicPopup.alert({
-           title: 'Nouvelle invitation!',
-           template: guest + ' souhaite vous voir!',
-        });
+        $cordovaToast.showShortCenter(guest + ' souhaite vous voir!');
 
         $scope.invitationId = invitationId;
-
+        $scope.senderName = guest;
         $scope.emojiPath = invitation.data[0].emoji_path;
 
         NgMap.getMap().then(function(map) {
@@ -219,7 +255,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
              draggable: false,
              icon: {
                url : senderImg,
-               scaledSize: new google.maps.Size(20, 20)
+               scaledSize: new google.maps.Size(25, 25)
              }
           });
           // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
@@ -229,6 +265,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           map.fitBounds($scope.bounds);
           //affiche la div du bottom pour le choix des moyens de transports
           $scope.showDirection = true;
+          $('.infosMap').addClass('visible');
 
           $scope.emitGuessPosition = false;
 
@@ -269,9 +306,10 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     $scope.directionsDisplay.set('directions', null);
     // chache la div
     $scope.showDirection = false;
+    $('.infosMap').removeClass('visible');
     $scope.response = false;
     $scope.showClosePendingInvitation = false;
-    angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "block"});
+    //angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "block"});
     $ionicPopup.alert({
        title: 'Informations',
        template: guest + ' a mit fin à l\'invitation.',
@@ -329,6 +367,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         $scope.map.fitBounds($scope.bounds);
         //affiche la div du bottom pour le choix des moyens de transports
         $scope.showDirection = true;
+        $('.infosMap').addClass('visible');
 
         // trace itinéraire piéton par défaut + temps de voyage
         $scope.renderDirection(new google.maps.LatLng(lat, lng), invitations.data[0].sender_position, google.maps.TravelMode.WALKING, "walk");
@@ -367,10 +406,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
               sender = senderPhone;
             }
 
-            $ionicPopup.alert({
-               title: 'Nouvelle invitation!',
-               template: sender + ' souhaite vous voir!',
-            });
+            //$cordovaToast.showShortCenter(sender + ' souhaite vous voir!');
 
             var senderImg;
             if ((typeof getUserInfosByPhone.getInfos(senderPhone) !== 'undefined') && (getUserInfosByPhone.getInfos(senderPhone).image_path !== "")) {
@@ -385,6 +421,8 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
               senderImg = "img/marker-user.png";
             }
 
+            $scope.senderName = sender;
+
             $scope.emojiPath = invitation.data[0].emoji_path;
             NgMap.getMap().then(function(map) {
               // crée le marker du sender
@@ -395,7 +433,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
                  draggable: false,
                  icon: {
                    url : senderImg,
-                   scaledSize: new google.maps.Size(20, 20)
+                   scaledSize: new google.maps.Size(25, 25)
                  }
               });
               // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
@@ -472,6 +510,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     $scope.directionsService = new google.maps.DirectionsService();
     $scope.service = new google.maps.DistanceMatrixService();
     $scope.directionsDisplay.setMap(map);
+    $scope.directionsDisplay.setOptions( { suppressMarkers: true } );
 
     // évenement de map lorsqu'on drag (swipe sur la map pour change la direction)
     map.addListener('drag', function() {
@@ -649,6 +688,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           map.fitBounds($scope.bounds);
           //affiche la div du bottom pour le choix des moyens de transports
           $scope.showDirection = true;
+          $('.infosMap').addClass('visible');
 
           // trace itinéraire piéton par défaut + temps de voyage
           $scope.renderDirection(new google.maps.LatLng(lat, lng), $scope.markerSender.position, google.maps.TravelMode.WALKING, "walk");
@@ -706,7 +746,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             $scope.emitGuessPosition = true;
 
             //masque les moyens de transports non selectionnes
-            angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "none"});
+            //angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "none"});
 
             //obtient le type de moyen de transport
             $scope.validateTransportKind = angular.element(document.querySelectorAll('div.transport.selected')).attr('kind');
@@ -727,6 +767,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             $scope.directionsDisplay.set('directions', null);
             // chache la div
             $scope.showDirection = false;
+            $('.infosMap').removeClass('visible');
             $scope.response = false;
             // zoom
             $scope.map.setZoom(16);
@@ -757,6 +798,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         if (typeof $scope.alreadyGetInvitation === 'undefined') {
           checkGuestPendingInvitation(lat, lng);
         }
+
     });
 
     // start the watcher géoloc
@@ -826,6 +868,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
          $scope.directionsDisplay.set('directions', null);
          // chache la div
          $scope.showDirection = false;
+         $('.infosMap').removeClass('visible');
          $scope.response = false;
 
          // prévient le sender que l'invité quitte l'invitation
@@ -846,7 +889,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
        $scope.showClosePendingInvitation = false;
 
-       angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "block"});
+       //angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "block"});
 
        $http.post(new Ionic.IO.Settings().get('serverUrl') + '/closeInvitation',
        {
@@ -886,15 +929,16 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
          }
          else {
            // puis affiche le temps de trajet + distance à l'endroit correspondant
-           if (memoTransport === "walk") {
-             $('span.transport.walk').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
-           }
-           else if (memoTransport === "bicycle") {
-             $('span.transport.bicycle').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
-           }
-           else {
-             $('span.transport.car').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
-           }
+          //  if (memoTransport === "walk") {
+          //    $('span.transport.walk').html(response.rows[0].elements[0].distance.text + ',</br> ' + response.rows[0].elements[0].duration.text);
+          //  }
+          //  else if (memoTransport === "bicycle") {
+          //    $('span.transport.bicycle').html(response.rows[0].elements[0].distance.text + ',</br> ' + response.rows[0].elements[0].duration.text);
+          //  }
+          //  else {
+          //    $('span.transport.car').html(response.rows[0].elements[0].distance.text + ',</br> ' + response.rows[0].elements[0].duration.text);
+          //  }
+           $('span.duration').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
            // si les personnes sont toutes proches, alors la course est terminée
            if (response.rows[0].elements[0].distance.value <= new Ionic.IO.Settings().get('minInvitationDistance')) {
              // l'invité est arrivé, on met en bdd comme quoi l'invitation est terminée
@@ -914,6 +958,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
                $scope.directionsDisplay.set('directions', null);
                // chache la div
                $scope.showDirection = false;
+               $('.infosMap').removeClass('visible');
                $scope.response = false;
                // zoom
                $scope.map.setZoom(16);
@@ -922,7 +967,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
                // cache le bouton qui permet de finir a tout moment l'invitation en cours
                $scope.showClosePendingInvitation = false;
-               angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "block"});
+               //angular.element(document.querySelectorAll('div.transport:not(.selected)')).css({"display": "block"});
 
              }, function errorCallback(err) {
                console.log(err);
@@ -962,22 +1007,23 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
                console.log('Error was: ' + status);
              }
              else {
-               // puis affiche le temps de trajet + distance à l'endroit correspondant
-               if (memoTransport === "walk") {
-                $('span.transport.walk').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
-                $('span.transport.bicycle').empty();
-                $('span.transport.car').empty();
-               }
-               else if (memoTransport === "bicycle") {
-                 $('span.transport.walk').empty();
-                 $('span.transport.bicycle').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
-                 $('span.transport.car').empty();
-               }
-               else {
-                 $('span.transport.walk').empty();
-                 $('span.transport.bicycle').empty();
-                 $('span.transport.car').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
-               }
+              //  // puis affiche le temps de trajet + distance à l'endroit correspondant
+              //  if (memoTransport === "walk") {
+              //   $('span.transport.walk').html(response.rows[0].elements[0].distance.text + ',</br> ' + response.rows[0].elements[0].duration.text);
+              //   $('span.transport.bicycle').empty();
+              //   $('span.transport.car').empty();
+              //  }
+              //  else if (memoTransport === "bicycle") {
+              //    $('span.transport.walk').empty();
+              //    $('span.transport.bicycle').html(response.rows[0].elements[0].distance.text + ',</br> ' + response.rows[0].elements[0].duration.text);
+              //    $('span.transport.car').empty();
+              //  }
+              //  else {
+              //    $('span.transport.walk').empty();
+              //    $('span.transport.bicycle').empty();
+              //    $('span.transport.car').html(response.rows[0].elements[0].distance.text + ',</br> ' + response.rows[0].elements[0].duration.text);
+              //  }
+               $('span.duration').html(response.rows[0].elements[0].distance.text + ', ' + response.rows[0].elements[0].duration.text);
              }
            }
          }
