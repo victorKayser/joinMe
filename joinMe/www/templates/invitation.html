@@ -1,43 +1,46 @@
-<ion-view view-title="Who is coming ?">
-  <button class="button button-full button-positive joinMeNow" ng-click="validateInvitation()"> <i class="ion-paper-airplane"></i> Join me now !</button>
 
-  <ion-content class="contentInvitation">
-    <h3>For what ?</h3>
-    <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}; emojiIsSelected = false;">
-      <div class="row2">
-        <img ng-repeat="emoji in objEmojiRaw1" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
-      </div>
-      <div class="row2">
-        <img ng-repeat="emoji in objEmojiRaw2" class="eachEmoji" ng-class="{selected: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
-      </div>
-    </ion-scroll>
 
-    <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
-      <ion-tab icon="ion-ios-person-outline" >
-        <ion-nav-view name="home-tab" class="item-menu">
-          <div ng-repeat="model in contacts | orderBy:'displayName'">
-            <ion-checkbox id="{{model.phoneNumbers}}" class="aloneContact" ng-if="model.displayName !== '' && model.phoneNumbers !== null && model.isRegistered === true" ng-model='checkStatus' ng-click='doIfChecked(checkStatus, model.phoneNumbers[0].value)'>
-                {{model.displayName}}
-            </ion-checkbox>
-          </div>
-        </ion-nav-view>
-      </ion-tab>
-      <ion-tab icon="ion-ios-people-outline">
-        <ion-nav-view name="menu-tab" class="item-menu">
-          <div ng-repeat="eachGroup in groupObject | unique:'group'">
-            <ion-checkbox class="group" ng-model='groupState' ng-click='selectContactFromGroup(eachGroup.group, groupState)'>
-              <div class="itemGroup">
-                {{eachGroup.group}}
-              </div>
-              <div ng-repeat="contact in groupObject | orderBy:'name'">
-                <div class='{{eachGroup.group}} htmlContactInGroup' phone="{{contact.phoneNumber}}" ng-if="contact.group === eachGroup.group && contact.name !== ''">
-                  {{contact.name}}
+<ion-modal-view ng-controller="InvitationCtrl">
+    <ion-content class="contentInvitation">
+      <span class="titleActivity">Activité</span>
+      <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}; emojiIsSelected = false;">
+        <div class="row2">
+          <img ng-repeat="emoji in objEmojiRaw1" class="eachEmoji" ng-class="{selectedIcon: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
+        </div>
+        <div class="row2">
+          <img ng-repeat="emoji in objEmojiRaw2" class="eachEmoji" ng-class="{selectedIcon: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
+        </div>
+      </ion-scroll>
+
+      <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
+        <ion-tab icon="ion-ios-person-outline" >
+          <ion-nav-view name="home-tab" class="item-menu">
+            <div ng-repeat="model in contacts | orderBy:'displayName'">
+              <ion-checkbox id="{{model.phoneNumbers}}" class="aloneContact" ng-if="model.displayName !== '' && model.phoneNumbers !== null && model.isRegistered === true" ng-model='checkStatus' ng-click='doIfChecked(checkStatus, model.phoneNumbers[0].value)'>
+                  {{model.displayName}}
+              </ion-checkbox>
+            </div>
+          </ion-nav-view>
+        </ion-tab>
+        <ion-tab icon="ion-ios-people-outline">
+          <ion-nav-view name="menu-tab" class="item-menu">
+            <div ng-repeat="eachGroup in groupObject | unique:'group'">
+              <ion-checkbox class="group" ng-model='groupState' ng-click='selectContactFromGroup(eachGroup.group, groupState)'>
+                <div class="itemGroup">
+                  {{eachGroup.group}}
                 </div>
-              </div>
-            </ion-checkbox>
-          </div>
-        </ion-nav-view>
-      </ion-tab>
-    </ion-tabs>
-  </ion-content>
-</ion-view>
+                <div ng-repeat="contact in groupObject | orderBy:'name'">
+                  <div class='{{eachGroup.group}} htmlContactInGroup' phone="{{contact.phoneNumber}}" ng-if="contact.group === eachGroup.group && contact.name !== ''">
+                    {{contact.name}}
+                  </div>
+                </div>
+              </ion-checkbox>
+            </div>
+          </ion-nav-view>
+        </ion-tab>
+      </ion-tabs>
+      <div class="containerJoinMeNow" ng-click="gestureClosePopup($event)">
+        <button class="joinMeNow" ng-click="validateInvitation()"> <i class="ion-paper-airplane"></i>  Inviter</button>
+      </div>
+    </ion-content>
+  </ion-modal-view>

@@ -1,4 +1,4 @@
-starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $timeout, $ionicPopup, $ionicPlatform, $ionicSideMenuDelegate) {
+starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $timeout, $ionicPopup, $ionicPlatform, $ionicSideMenuDelegate, $ionicModal) {
   //arrivée sur l'appli
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
@@ -35,8 +35,23 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     var lng = $scope.markerLocalisationDraggable.getPosition().lng();
     var posLs = lat + ', ' + lng;
     window.localStorage['invitationPosition'] = JSON.stringify(posLs);
-    $state.go('invitation');
+    //$state.go('invitation');
+
+    $ionicModal.fromTemplateUrl('templates/invitation.html', {
+      scope: $scope
+    }).then(function(modal) {
+      $rootScope.modal = modal;
+      $rootScope.modal.show();
+      $('.joinmeBtn').fadeOut(100);
+    });
+
   };
+
+  $scope.$on('modal.hidden', function() {
+    $timeout(function(){
+      $('.joinmeBtn').fadeIn(400);
+    }, 300);
+  });
 
   $scope.gestureInfosMap = function() {
     $('.ion-chevron-down').css('display', 'none');
@@ -454,50 +469,97 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     });
   }
 
-  if(!new Ionic.IO.Settings().get('isPC')) {
-      $rootScope.push.on('notification', function(data) {
-          // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
-          if (typeof data.additionalData.invitationId !== 'undefined') {
-            // si on n'est pas deja entrain de rejoindre quelqu'un
-            if (!$scope.emitGuessPosition) {
-              // si on a pas deja recu l'info via le socket
-              if (parseFloat($scope.alreadyGetInvitation) !== parseFloat(data.additionalData.invitationId)) {
-                getInvitation(data.additionalData.invitationId, data.additionalData.sender_phoneNumber);
+
+  $ionicPlatform.ready(function() {
+
+    // si la personne à un compte et est connectée
+    if (window.localStorage['user']) {
+      if(JSON.parse(window.localStorage['user']) !== null) {
+
+        //join la room correspondant à mon id
+        var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
+        socket.emit('joinMyIdRoom', JSON.parse(window.localStorage['user']).id_users);
+
+        if(!new Ionic.IO.Settings().get('isPC')) {
+          // INIT PUSH
+          $rootScope.push = PushNotification.init({
+              android: {
+                  senderID : new Ionic.IO.Settings().get('senderId')
+              },
+              ios: {
+                  alert: "true",
+                  badge: "true",
+                  sound: "true"
               }
+          });
+          $rootScope.push.on('registration', function(data) {
+            var registrationId = data.registrationId;
+            var user_id =  JSON.parse(window.localStorage['user']).id_users;
+            var OS = ionic.Platform.platform();
+            // met en bdd pour l'user en question le token de push ainsi que son device (ios ou android)
+            $http.post(new Ionic.IO.Settings().get('serverUrl') + '/setPushInfos',
+            {
+              id : user_id,
+              token: registrationId,
+              os: OS,
+            })
+            .then(function successCallback(contactsChecked) {
+              $rootScope.push.on('notification', function(data) {
+                  // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
+                  if (typeof data.additionalData.invitationId !== 'undefined') {
+                    // si on n'est pas deja entrain de rejoindre quelqu'un
+                    if (!$scope.emitGuessPosition) {
+                      // si on a pas deja recu l'info via le socket
+                      if (parseFloat($scope.alreadyGetInvitation) !== parseFloat(data.additionalData.invitationId)) {
+                        getInvitation(data.additionalData.invitationId, data.additionalData.sender_phoneNumber);
+                      }
+                    }
+                  }
+                  // invitation terminée a l'inivitative du sender
+                  else if(typeof data.additionalData.senderCloseInvitation !== 'undefined') {
+                    if (parseFloat($scope.invitationClosed) !== parseFloat(data.additionalData.leavedInvitation)) {
+                      var senderPhoneNumber = data.additionalData.senderPhoneNumber;
+                      var leavedInvitation = data.additionalData.leavedInvitation;
+                      senderCloseInvitation(senderPhoneNumber, leavedInvitation);
+                      $timeout(function(){
+                        checkGuestPendingInvitation($scope.myLat, $scope.myLng);
+                      }, 5000);
+                    }
+                  }
+                  // invitation terminée a l'inivitative de l'invité
+                  else if(typeof data.additionalData.guestCloseInvitation !== 'undefined') {
+                    var guestPhoneNumber = data.additionalData.guestPhoneNumber;
+                    var remainingGuestNumber = data.additionalData.remainingGuestNumber;
+                    var leavedInvitation = data.additionalData.leavedInvitation;
+                    if (($scope.leavedGuest.indexOf(guestPhoneNumber) === -1) && (!$scope.invitationClosedCauseEmpty)) {
+                      guestCloseInvitation(guestPhoneNumber, remainingGuestNumber, leavedInvitation);
+                    }
+                  }
+                  // un invité a accepté l'invitation
+                  else if(typeof data.additionalData.guestIsComming !== 'undefined') {
+                    if (typeof getUserInfosByPhone.getInfos(data.additionalData.guestPhone) !== 'undefined') {
+                      guest = getUserInfosByPhone.getInfos(data.additionalData.guestPhone).displayName;
+                    }
+                    else {
+                      guest = data.additionalData.guestPhone;
+                    }
+                    $cordovaToast.showShortBottom(guest + ' a accepté votre invitation.');
+                  }
+              });
             }
-          }
-          // invitation terminée a l'inivitative du sender
-          else if(typeof data.additionalData.senderCloseInvitation !== 'undefined') {
-            if (parseFloat($scope.invitationClosed) !== parseFloat(data.additionalData.leavedInvitation)) {
-              var senderPhoneNumber = data.additionalData.senderPhoneNumber;
-              var leavedInvitation = data.additionalData.leavedInvitation;
-              senderCloseInvitation(senderPhoneNumber, leavedInvitation);
-              $timeout(function(){
-                checkGuestPendingInvitation($scope.myLat, $scope.myLng);
-              }, 5000);
-            }
-          }
-          // invitation terminée a l'inivitative de l'invité
-          else if(typeof data.additionalData.guestCloseInvitation !== 'undefined') {
-            var guestPhoneNumber = data.additionalData.guestPhoneNumber;
-            var remainingGuestNumber = data.additionalData.remainingGuestNumber;
-            var leavedInvitation = data.additionalData.leavedInvitation;
-            if (($scope.leavedGuest.indexOf(guestPhoneNumber) === -1) && (!$scope.invitationClosedCauseEmpty)) {
-              guestCloseInvitation(guestPhoneNumber, remainingGuestNumber, leavedInvitation);
-            }
-          }
-          // un invité a accepté l'invitation
-          else if(typeof data.additionalData.guestIsComming !== 'undefined') {
-            if (typeof getUserInfosByPhone.getInfos(data.additionalData.guestPhone) !== 'undefined') {
-              guest = getUserInfosByPhone.getInfos(data.additionalData.guestPhone).displayName;
-            }
-            else {
-              guest = data.additionalData.guestPhone;
-            }
-            $cordovaToast.showShortBottom(guest + ' a accepté votre invitation.');
-          }
-      });
-  }
+            , function errorCallback(err) {
+            });
+          });
+        }
+      }
+      else {
+        $state.go('home');
+      }
+    }
+    else {
+      $state.go('home');
+    }
+  });
 
   NgMap.getMap().then(function(map) {
     $scope.map = map;
@@ -676,9 +738,9 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
          }
         );
 
-        $scope.markerLocalisation.addListener('click', function() {
-          $state.go('invitation');
-        });
+        // $scope.markerLocalisation.addListener('click', function() {
+        //   $state.go('invitation');
+        // });
         $scope.bounds.extend($scope.markerLocalisation.position);
         $scope.bounds.extend($scope.markerLocalisationDraggable.position);
 

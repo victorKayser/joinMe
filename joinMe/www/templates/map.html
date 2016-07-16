@@ -1,12 +1,9 @@
 <ion-view hide-back-button="true" hide-nav-bar="true" view-title="JoinMe">
-  <ion-nav-buttons side="right">
-    <i ng-hide="activeTab == 'home'" class="ion-gear-a" ui-sref="settings"></i>
-  </ion-nav-buttons>
   <ng-map></ng-map>
     <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><i class="ion-android-locate"></i></button>
     <div class="containerJoinMeBtn">
-      <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="button button-outline joinmeBtn">Join Me</button></a>
+      <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="button joinmeBtn">Join Me</button></a>
     </div>
 
     <input id="pac-input" class="adressInput" type="text" ng-model="address" ng-blur="updateAddress()" ng-focus="disableTap()">

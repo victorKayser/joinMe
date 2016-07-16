@@ -1,10 +1,16 @@
 
-starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http) {
+starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http, $ionicModal) {
 
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
   // disable swipe on the view
   $ionicSideMenuDelegate.canDragContent(false);
+
+  $scope.gestureClosePopup = function(event) {
+    if (event.target.className !== 'joinMeNow activated') {
+      $rootScope.modal.hide();
+    }
+  }
   // get all contacts
   $scope.getAllContacts = function() {
     $cordovaContacts.find({})
@@ -97,12 +103,11 @@ starter.controller('InvitationCtrl', function($scope, $state, $cordovaContacts, 
 
          })
          .then(function successCallback(data) {
-           // redirect to map view
-            $state.go('map');
             //avec l'id de la nouvelle invitation, on fait rejoindre le sender dans la socket room de cet id
             socket.emit('joinInvitationRoom', data.data.invitationId);
             socket.emit('preventSenderInvited', data.data.tabUserId, data.data.invitationId, sender_phoneNumber);
-            $cordovaToast.showShortBottom('Invitation sended...');
+            $cordovaToast.showShortCenter('Invitation sended...');
+            $rootScope.modal.hide();
          }
          , function errorCallback(err) {
 

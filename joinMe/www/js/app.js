@@ -8,46 +8,6 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
 .run(function($ionicPlatform, $state, $rootScope, $http) {
   $ionicPlatform.ready(function() {
 
-    // si la personne à un compte et est connectée
-    if (window.localStorage['user']) {
-      if(JSON.parse(window.localStorage['user']) !== null) {
-
-        //join la room correspondant à mon id
-        var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
-        socket.emit('joinMyIdRoom', JSON.parse(window.localStorage['user']).id_users);
-
-        $state.go('map');
-
-        if(!new Ionic.IO.Settings().get('isPC')) {
-          // INIT PUSH
-          $rootScope.push = PushNotification.init({
-              android: {
-                  senderID : new Ionic.IO.Settings().get('senderId')
-              },
-              ios: {
-                  alert: "true",
-                  badge: "true",
-                  sound: "true"
-              }
-          });
-          $rootScope.push.on('registration', function(data) {
-            var registrationId = data.registrationId;
-            var user_id =  JSON.parse(window.localStorage['user']).id_users;
-            var OS = ionic.Platform.platform();
-            // met en bdd pour l'user en question le token de push ainsi que son device (ios ou android)
-            $http.post(new Ionic.IO.Settings().get('serverUrl') + '/setPushInfos',
-            {
-              id : user_id,
-              token: registrationId,
-              os: OS,
-            })
-            .then(function successCallback(contactsChecked) {}
-            , function errorCallback(err) {});
-          });
-        }
-      }
-    }
-
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
@@ -68,7 +28,7 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
 
   $stateProvider
   .state('map', {
-    url: '/map',
+    url: '/',
     templateUrl: 'templates/map.html',
     controller: 'MapCtrl'
   })
@@ -78,12 +38,12 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
     templateUrl: 'templates/contact.html',
     controller: 'ContactCtrl'
   });
-  $stateProvider
-  .state('invitation', {
-    url: '/invitation',
-    templateUrl: 'templates/invitation.html',
-    controller: 'InvitationCtrl'
-  });
+  // $stateProvider
+  // .state('invitation', {
+  //   url: '/invitation',
+  //   templateUrl: 'templates/invitation.html',
+  //   controller: 'InvitationCtrl'
+  // });
   $stateProvider
   .state('settings', {
     url: '/settings',
@@ -92,7 +52,7 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
   });
   $stateProvider
   .state('home', {
-    url: '/',
+    url: '/home',
     templateUrl: 'templates/home.html',
     controller: 'HomeCtrl'
   });
