@@ -38,18 +38,53 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     //$state.go('invitation');
 
     $ionicModal.fromTemplateUrl('templates/invitation.html', {
+      id: '1',
       scope: $scope
     }).then(function(modal) {
       $rootScope.modal = modal;
       $rootScope.modal.show();
       $('.joinmeBtn').fadeOut(100);
     });
-
   };
 
-  $scope.$on('modal.hidden', function() {
+  $scope.openContactModal = function() {
+    $('.btnContact').addClass('rotateIcon');
+
+    $ionicModal.fromTemplateUrl('templates/contact.html', {
+      id: '2',
+      scope: $scope
+    }).then(function(modal) {
+      $rootScope.modalContact = modal;
+      $rootScope.modalContact.show();
+      $('.joinmeBtn').fadeOut(100);
+    });
+  };
+  $scope.openSettingsModal = function() {
+    $('.btnSettings').addClass('rotateIcon');
+
+    $ionicModal.fromTemplateUrl('templates/settings.html', {
+      id: '3',
+      scope: $scope,
+    }).then(function(modal) {
+      $rootScope.modalSettings = modal;
+      $rootScope.modalSettings.show();
+      $('.joinmeBtn').fadeOut(100);
+    });
+  };
+
+
+
+  $scope.$on('modal.hidden', function(event, modal) {
     $timeout(function(){
       $('.joinmeBtn').fadeIn(400);
+      if (modal.id === '1') {
+      }
+      else if (modal.id === '2') {
+        $('.btnContact').removeClass('rotateIcon');
+      }
+      else {
+        $('.btnSettings').removeClass('rotateIcon');
+      }
     }, 300);
   });
 
@@ -68,28 +103,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     }
 
   }
-
-  $scope.rotateHamburger = function() {
-    if ($('.hamburgerIcon').hasClass('rotateHamburger')) {
-      $('.hamburgerIcon').removeClass('rotateHamburger');
-    }
-    else {
-      $scope.animateHamburger = true;
-      $('.hamburgerIcon').addClass('rotateHamburger');
-    }
-  }
-
-  // animer le menu icon quand on ferme le menu
-  $scope.$watch(function () {
-    return $ionicSideMenuDelegate.isOpen();
-  },
-     function (isOpen) {
-    if (!isOpen){
-      if($scope.animateHamburger) {
-        $('.hamburgerIcon').removeClass('rotateHamburger');
-      }
-    }
-  });
 
   // variables tache de fond ou pas pour ne pas recevoir quand app en background les positions des invités
   // revient de tache de fond

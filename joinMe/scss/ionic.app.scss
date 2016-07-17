@@ -39,8 +39,8 @@ ng-map {
   transition: transform 2s;
   -webkit-transition: transform 2s;
 }
-.rotateHamburger {
-  transform: rotate(720deg);
+.rotateIcon {
+  transform: rotate(360deg);
 }
 .infosMap {
   height: 150px;
@@ -210,6 +210,21 @@ span.transport {
     background-color: rgba(255, 113, 44, 0.8);
   }
 }
+
+.addPicture {
+  font-size: 15px;
+  border-radius: 50px;
+  border : solid 2px rgb(255, 113, 44);
+  color: white;
+  font-weight: bold;
+  background-color: rgb(255, 113, 44);
+  height: 50px;
+  transition: opacity 1s;
+  -webkit-transition: opacity 1s;
+  &:active {
+    background-color: rgba(255, 113, 44, 0.8);
+  }
+}
 .containerJoinMeNow {
   width: 100%;
   overflow: visible;
@@ -284,11 +299,16 @@ ion-modal-view {
   overflow: scroll;
   text-align: left;
 }
+.contact .item-menu {
+  padding-top: 50px;
+  height: 100% !important;
+}
 
 .contact {
   .tab-nav.tabs {
     margin-top: 0;
     top: 0;
+    border-radius: 15px 15px 0 0;
   }
 }
 
@@ -304,7 +324,7 @@ ion-modal-view {
   margin-bottom: 25px;
   width: 150px;
   height: 150px;
-  margin-top: 80px;
+  margin-top: 40px;
   position: relative;
   overflow: hidden;
   border-radius: 50%;
@@ -320,6 +340,9 @@ ion-modal-view {
 
 .center {
   text-align: center;
+  position: absolute;
+  width: 100%;
+    bottom: 30px;
 }
 
 .imgSideMenu {
@@ -329,11 +352,6 @@ ion-modal-view {
 
 .nameSideMenu {
   margin-bottom: 25px;
-}
-
-.contactImg {
-  border-radius: 50%;
-  height: 50px;
 }
 
 .nameContact {
@@ -354,17 +372,28 @@ ion-modal-view {
 }
 .itemGroupContact {
   font-weight: bold;
-  font-size: 20px;
+  font-size: 15px;
   margin-bottom: 8px;
 
   .icon-right {
-    margin-right: 17px;
+    font-size: 18px;
+    margin-right: 5px;
+  }
+}
+.eachContactInGroup {
+  font-size: 12px;
+  height: 35px;
+  padding: 5px;
+  i {
+    margin-right: 10px;
   }
 }
 
 .itemContact {
-  padding-top: 10px;
-  padding-bottom: 10px;
+}
+.contactImg {
+  border-radius: 50%;
+  height: 35px;
 }
 
 .icon-right {
@@ -374,7 +403,7 @@ ion-modal-view {
 .closePendingInvitation {
   position: absolute;
   color: rgb(255, 113, 44);
-    top: 235px;
+    top: 175px;
     left: 5px;
     width: 50px;
     height: 50px;
@@ -383,12 +412,50 @@ ion-modal-view {
     border-radius: 50px;
 }
 .ion-close-round{
-  font-size: 25px;
+  font-size: 30px;
 }
 .recenterOnMe {
+  font-size: 30px;
+  position: absolute;
+    top: 115px;
+    left: 5px;
+    height: 50px;
+    width: 50px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    border: solid 1px gray;
+}
+.btnContact {
+  font-size: 30px;
+  position: absolute;
+    top: 235px;
+    right: 5px;
+    height: 50px;
+    width: 50px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    border: solid 1px gray;
+    transition: transform 1s;
+    -webkit-transition: transform 1s;
+}
+.btnSettings {
+  font-size: 30px;
   position: absolute;
     top: 175px;
-    left: 5px;
+    right: 5px;
+    height: 50px;
+    width: 50px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    border: solid 1px gray;
+    transition: transform 1s;
+    -webkit-transition: transform 1s;
+}
+.btnHome {
+  font-size: 30px;
+  position: absolute;
+    top: 115px;
+    right: 5px;
     height: 50px;
     width: 50px;
     background-color: rgba(255, 255, 255, 0.3);
@@ -459,6 +526,18 @@ ion-modal-view {
   padding: 5px 15px;
   background-color: rgb(255, 113, 44);
 }
+.settings {
+  text-align: center;
+}
+.titleSettings {
+  font-size: 18px;
+  width: 100%;
+  font-weight: bold;
+  color: white;
+  border-radius: 15px;
+  padding: 5px 15px;
+  background-color: rgb(255, 113, 44);
+}
 .tabs-striped.tabs-positive .tabs {
   background-color: rgb(255, 113, 44);
 }
@@ -469,4 +548,21 @@ i.item-sideMenu {
   font-size: 25px;
   padding: 0;
   margin-right: 10px;
+}
+
+.contactOptions {
+  width: 10px;
+  position: absolute;
+    right: 15px;
+    top:40%;
+}
+.popoverItem {
+  font-size: 12px;
+}
+.popover {
+  height: 180px !important;
+}
+
+.button.button-positive {
+  background-color: rgb(255, 113, 44);
 }

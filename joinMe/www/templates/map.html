@@ -2,6 +2,9 @@
   <ng-map></ng-map>
     <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><i class="ion-android-locate"></i></button>
+    <button type="button" ng-click="openContactModal()" name="button" class="btnContact"><i class="ion-ios-people-outline"></i></button>
+    <button type="button" ng-click="openSettingsModal()" name="button" class="btnSettings"><i class="ion-gear-a"></i></button>
+    <button type="button" name="button" class="btnHome"><i class="ion-ios-home-outline"></i></button>
     <div class="containerJoinMeBtn">
       <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="button joinmeBtn">Join Me</button></a>
     </div>
@@ -55,5 +58,5 @@
       </div>
       <i ng-click="gestureInfosMap()" class="chevron ion-chevron-down"></i>
     </div>
-    <button ng-hide="activeTab == 'home'" ng-click="rotateHamburger()" class="hamburgerIcon button button-icon ion-navicon" menu-toggle="left"></button>
+    <!-- <button ng-hide="activeTab == 'home'" ng-click="rotateHamburger()" class="hamburgerIcon button button-icon ion-navicon" menu-toggle="left"></button> -->
 </ion-view>

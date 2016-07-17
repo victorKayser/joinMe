@@ -1,4 +1,4 @@
-starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http) {
+starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http, $ionicPopover) {
   $scope.getAllContacts = function() {
     $cordovaContacts.find({})
     // obtient tous les contact du téléphone
@@ -13,6 +13,13 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
       });
     });
   };
+
+  $ionicPopover.fromTemplateUrl('templates/popoverContact.html', {
+    scope: $scope,
+  }).then(function(popover) {
+    $scope.popover = popover;
+  });
+
 
   $scope.checkKnownUsers = function (contacts, done) {
     var filterContact = [];
@@ -48,6 +55,11 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
         $ionicTabsDelegate.select(selected - 1);
     }
   }
+  $scope.showPopoverContactOptions = function(contact, $event) {
+    $scope.optionContactSetted = contact;
+    $scope.popover.show($event);
+
+  };
   $scope.showPopup = function (contact) {
     $scope.data = {};
     if (contact.isRegistered) {
@@ -57,9 +69,9 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
         title: contact.displayName,
         scope: $scope,
         buttons: [{
-           text: 'Cancel'
+           text: 'Quitter'
         }, {
-           text: '<i class="ion-android-done"></i><b> Add</b>',
+           text: '<i class="ion-android-done"></i><b> Ajouter</b>',
            type: 'button-positive',
            onTap: function(e) {
              if (typeof($scope.data.group) !== 'undefined') {
@@ -103,16 +115,15 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
 
   $scope.addNewGroup = function () {
     $scope.newGroupData = {};
-    $scope.popupContactToGroup.close();
     $scope.newGroup = $ionicPopup.show({
       templateUrl: 'templates/popupNewGroup.html',
-      title: $scope.currentContact.displayName,
-      subTitle: 'Add to new group',
+      title: $scope.optionContactSetted.displayName,
+      subTitle: 'Ajouter au nouveau groupe',
       scope: $scope,
       buttons: [{
-         text: 'Cancel'
+         text: 'Quitter'
       }, {
-         text: '<i class="ion-android-add"></i><b> Add</b>',
+         text: '<i class="ion-android-add"></i><b> Ajouter</b>',
          type: 'button-positive',
          onTap: function(e) {
            if (typeof($scope.newGroupData.newGroupLabel) !== 'undefined') {
@@ -120,19 +131,19 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
 
              //ajoute le nouveau group et la personne dedans
              // ajoute la personne dans le groupe
-             $scope.addContactInGroup($scope.newGroupData.newGroupLabel, $scope.currentContact, function(err, res){
+             $scope.addContactInGroup($scope.newGroupData.newGroupLabel, $scope.optionContactSetted, function(err, res){
                if (!err) {
                  $scope.renderGroups();
-                 $cordovaToast.showShortBottom($scope.currentContact.displayName + ' added to new group ' + $scope.newGroupData.newGroupLabel);
+                 $cordovaToast.showShortBottom($scope.optionContactSetted.displayName + ' added to new group ' + $scope.newGroupData.newGroupLabel);
                }
                else {
-                 $cordovaToast.showShortBottom($scope.currentContact.displayName + ' already in the group ' + $scope.newGroupData.newGroupLabel);
+                 $cordovaToast.showShortBottom($scope.optionContactSetted.displayName + ' already in the group ' + $scope.newGroupData.newGroupLabel);
                }
              });
            }
            else {
              e.preventDefault();
-             $cordovaToast.showShortBottom('Please set the new group for ' + $scope.currentContact.displayName)
+             $cordovaToast.showShortBottom('Please set the new group for ' + $scope.optionContactSetted.displayName)
              .then(function(success) {
               }, function (error) {
               });

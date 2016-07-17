@@ -1,4 +1,4 @@
-starter.controller('SettingsCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $cordovaDialogs, $cordovaCamera, $cordovaFile, $ionicLoading, $cordovaFileTransfer, $http) {
+starter.controller('SettingsCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $cordovaDialogs, $cordovaCamera, $cordovaFile, $ionicLoading, $cordovaFileTransfer, $http, $timeout) {
 
   $scope.addPicture = function() {
     $cordovaDialogs.confirm('Choose your source', 'Profil picture', ['Camera','Galery'])
@@ -132,16 +132,19 @@ starter.controller('SettingsCtrl', function($scope, $state, NgMap, $cordovaGeolo
   // check si l'user a une image (dans le LS)
   var user = JSON.parse(window.localStorage['user']);
   if (user.image_path !== "") {
-    var image = document.getElementById('profil-picture');
-    image.src = new Ionic.IO.Settings().get('serverUploadDirectory') + user.image_path;
-    if (image.width > image.height) {
-      image.style.removeProperty('width');
-      image.style.height = "100%";
-    }
-    else {
-      image.style.removeProperty('height');
-      image.style.width = "100%";
-    }
+    $timeout(function() {
+      var path = new Ionic.IO.Settings().get('serverUploadDirectory') + user.image_path;
+      $('.profil-picture').attr('src', path);
+      if ($('.profil-picture').width() > $('.profil-picture').height()) {
+        $('.profil-picture').css('width', '');
+        $('.profil-picture').css('height', '100%');
+      }
+      else {
+        $('.profil-picture').css('height', '');
+        $('.profil-picture').css('width', '100%');
+      }
+    }, 1000);
+
   }
 
 });

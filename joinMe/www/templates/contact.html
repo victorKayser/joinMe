@@ -1,14 +1,11 @@
-<ion-view view-title="Contact" class="contact">
-  <ion-nav-buttons side="left">
-    <button ng-hide="activeTab == 'home'" class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
-  </ion-nav-buttons>
+<ion-modal-view ng-controller="ContactCtrl" class="contact">
   <ion-content>
     <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
       <ion-tab icon="ion-ios-person-outline" >
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:['-isRegistered','displayName']">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
-              <ion-item class="itemContact" ng-if="model.isRegistered === true" ng-click="showPopup(model)">
+              <ion-item  class="itemContact" ng-if="model.isRegistered === true">
                 <div ng-if="model.image_path.indexOf('.jpeg') > -1">
                   <img src="{{model.image_path}}" class="contactImg" alt="" />
                 </div>
@@ -16,8 +13,9 @@
                   <img src="img/ionic.png" class="contactImg" alt="" />
                 </div>
                 <div class="nameContact">{{model.displayName}}</div>
+                <i ng-click="showPopoverContactOptions(model, $event)" class="contactOptions ion-android-more-vertical"></i>
               </ion-item>
-              <ion-item class="itemContact" ng-if="model.isRegistered !== true" ng-click="showPopup(model)">
+              <ion-item class="itemContact" ng-if="model.isRegistered !== true">
                 <img src="img/ionic.png" class="contactImg" alt="" />
                 <div class="nameContact">{{model.displayName}}</div>
                 <i class="plusContactIcon ion-android-add"></i>
@@ -32,11 +30,11 @@
             <ion-list>
               <ion-item>
                 <div class="itemGroupContact">
-                  {{eachGroup.group}} <i ng-click="" class="icon-right ion-android-more-horizontal"></i>
+                  {{eachGroup.group}} <i ng-click="" class="icon-right ion-android-more-vertical"></i>
                 </div>
                 <div ng-repeat="contact in groupObject | orderBy:'name'">
                   <ion-list ng-if="contact.group === eachGroup.group">
-                    <ion-item ng-if="contact.name !== ''">
+                    <ion-item class="eachContactInGroup" ng-if="contact.name !== ''">
                       {{contact.name}} <i ng-click="deleteContactFromGroup(eachGroup.group, contact.phoneNumber)" class="icon-right ion-close"></i>
                     </ion-item>
                   </ion-list>
@@ -48,4 +46,4 @@
       </ion-tab>
     </ion-tabs>
   </ion-content>
-</ion-view>
+</ion-modal-view>

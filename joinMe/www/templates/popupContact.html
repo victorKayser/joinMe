@@ -1,11 +1,10 @@
 <div class="list">
   <label class="item item-input item-select">
     <div class="input-label">
-      Group
+      Groupe
     </div>
     <select ng-model="data.group">
       <option ng-repeat="eachGroup in groupObject | unique:'group'">{{eachGroup.group}}</option>
     </select>
   </label>
 </div>
-<button class="button button-full button-positive" ng-click="addNewGroup()"><i class="ion-android-add"></i> New group</button>
