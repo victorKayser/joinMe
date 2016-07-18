@@ -1,6 +1,6 @@
 
 
-<ion-modal-view ng-controller="InvitationCtrl">
+<ion-modal-view ng-controller="InvitationCtrl" class="modalInvitation">
     <ion-content class="contentInvitation">
       <span class="titleActivity">Activité</span>
       <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}; emojiIsSelected = false;">
@@ -40,7 +40,7 @@
         </ion-tab>
       </ion-tabs>
       <div class="containerJoinMeNow" ng-click="gestureClosePopup($event)">
-        <button class="joinMeNow" ng-click="validateInvitation()"> <i class="ion-paper-airplane"></i>  Inviter</button>
+        <button class="joinMeNow btnRougePastel" ng-click="validateInvitation()"> <i class="ion-paper-airplane"></i>  Inviter</button>
       </div>
     </ion-content>
   </ion-modal-view>

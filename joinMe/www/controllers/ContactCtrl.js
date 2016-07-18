@@ -1,4 +1,4 @@
-starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http, $ionicPopover) {
+starter.controller('ContactCtrl', function($scope, $rootScope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http, $ionicPopover, $timeout) {
   $scope.getAllContacts = function() {
     $cordovaContacts.find({})
     // obtient tous les contact du téléphone
@@ -7,6 +7,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
       $scope.checkKnownUsers(allContacts, function(err, res) {
         if (!err) {
           $scope.contacts = res;
+          $rootScope.contacts = res;
           $ionicLoading.hide();
           $scope.renderGroups();
         }
@@ -156,7 +157,7 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
   $scope.renderGroups = function() {
     // si la personne a fait des groups de contacts
     if (typeof(window.localStorage['groups']) !== 'undefined') {
-      $scope.groupObject = JSON.parse(window.localStorage['groups']);
+      $rootScope.groupObject = JSON.parse(window.localStorage['groups']);
     }
   }
 
@@ -249,11 +250,22 @@ starter.controller('ContactCtrl', function($scope, $state, $cordovaContacts, $io
   }
   // mobile
   else {
-    // loader
-    $ionicLoading.show({
-      template: '<ion-spinner icon="android"/>'
-    });
-    $scope.getAllContacts();
+    if (!$rootScope.viewedContactView) {
+      if ($rootScope.contacts) {
+        $scope.contacts = $rootScope.contacts;
+      }
+      else {
+        $timeout(function() {
+          // loader
+          $ionicLoading.show({
+            template: '<ion-spinner icon="android"/>'
+          });
+          $scope.getAllContacts();
+        }, 400);
+      }
+      $rootScope.viewedContactView = true;
+    }
+    $scope.renderGroups();
   }
 
 })

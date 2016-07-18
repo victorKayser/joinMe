@@ -1,13 +1,13 @@
-starter.controller('HomeCtrl', function($scope, $state, phoneFormatter, $rootScope, auth, $http, $ionicPopup) {
+starter.controller('HomeCtrl', function($scope, $state, phoneFormatter, $rootScope, auth, $http, $ionicPopup, $cordovaToast) {
   $scope.dataConnexionForm = {};
 
-  // si la personne à un compte et est connectée
-  // if (window.localStorage['user']) {
-  //   if(JSON.parse(window.localStorage['user']) !== null) {
-  //     //on va direct sur la map page
-  //     $state.go('map');
-  //   }
-  // }
+  //si la personne à un compte et est connectée
+  if (window.localStorage['user']) {
+    if(JSON.parse(window.localStorage['user']) !== null) {
+      //on va direct sur la map page
+      $state.go('map');
+    }
+  }
 
   $scope.createAccount = function() {
     $state.go('registration');
@@ -59,10 +59,7 @@ starter.controller('HomeCtrl', function($scope, $state, phoneFormatter, $rootSco
             }
           }
           else {
-            $ionicPopup.alert({
-               title: 'Erreur!',
-               template: 'Couple n° téléphone / mot de passe incorrect.',
-            });
+            $cordovaToast.showShortBottom('Couple n° téléphone / mot de passe incorrect.');
             console.log('pas ok du tout');
           }
         });
@@ -70,17 +67,11 @@ starter.controller('HomeCtrl', function($scope, $state, phoneFormatter, $rootSco
       else {
         $scope.dataConnexionForm.phoneNumber = '';
         $scope.dataConnexionForm.password = '';
-        $ionicPopup.alert({
-           title: 'Erreur!',
-           template: 'Mauvais format pour votre n° de téléphone.',
-        });
+        $cordovaToast.showShortBottom('Mauvais format pour votre n° de téléphone.');
       }
     }
     else {
-      $ionicPopup.alert({
-         title: 'Erreur!',
-         template: 'Veuillez renseigner votre n° de téléphone.',
-      });
+      $cordovaToast.showShortBottom('Veuillez renseigner votre n° de téléphone.');
       $scope.dataConnexionForm.password = '';
     }
   }

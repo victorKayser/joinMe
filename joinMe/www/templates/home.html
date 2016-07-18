@@ -1,19 +1,24 @@
 
-<ion-view view-title="home">
-  <ion-content>
+<ion-view view-title="home" class="homeView">
+  <h1 class="appTitle">Join Me</h1>
+  <ion-content class="contentHome">
     <div class="list list-inset">
       <label class="item item-input">
-        <input type="tel" placeholder="Phone number" ng-model="dataConnexionForm.phoneNumber">
+      <input type="tel" placeholder="N° de téléphone" ng-model="dataConnexionForm.phoneNumber">
       </label>
       <label class="item item-input">
-        <input type="password" placeholder="Password" ng-model="dataConnexionForm.password">
+        <input type="password" placeholder="Mot de passe" ng-model="dataConnexionForm.password">
       </label>
     </div>
-    <button class="button button-full button-positive" ng-click='connect()'>
-    Connect !
-    </button>
-    <button class="button button-full button-outline button-positive" ng-click="createAccount()">
-    Create an account
-    </button>
+    <div class="containerBtnHome">
+      <button class="btnConnection btnRougePastel" ng-click='connect()'>
+      Connexion
+      </button>
+    </div>
+    <div class="containerBtnHome">
+      <button class=" btnCreateAccount btnBrinClair" ng-click="createAccount()">
+      Créer un compte
+      </button>
+    </div>
   </ion-content>
 </ion-view>

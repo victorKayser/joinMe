@@ -1,21 +1,42 @@
-<ion-view view-title="Registration">
-  <ion-content>
-    <div class="list">
-      <label class="item item-input item-floating-label">
-        <span class="input-label">Phone number</span>
-        <input type="tel" placeholder="Phone number" ng-model="dataRegistration.phoneNumber">
-      </label>
-      <label class="item item-input item-floating-label">
-        <span class="input-label">Password</span>
-        <input type="password" placeholder="Password" ng-model="dataRegistration.password1">
-      </label>
-      <label class="item item-input item-floating-label">
-        <span class="input-label">Confirm password</span>
-        <input type="password" placeholder="Confirm password" ng-model="dataRegistration.password2">
+<div class="centerContent">
+  <h1 class="appTitle registration"><i ui-sref="home" class="ion-arrow-left-c"></i>Join Me</h1>
+</div>
+<ion-slide-box ng-init="disableSwipe()" delegate-handle="registration" class="registrationView">
+  <ion-slide>
+    <div class="list list-inset">
+      <label class="item item-input">
+      <input id="phone" type="tel" placeholder="N° de téléphone" ng-model="dataRegistration.phoneNumber" ng-keydown="stopTab($event);">
       </label>
     </div>
-    <button class="button button-full button-positive" ng-click="create()">
-    Create
-    </button>
-  </ion-content>
-</ion-view>
+    <div class="containerBtnValidate">
+      <button id="validatePhone" class="btnRougePastel" ng-click="validatePhone()">
+        Suivant<i class="ion-ios-arrow-right"></i>
+      </button>
+    </div>
+
+  </ion-slide>
+  <ion-slide>
+    <div class="list list-inset">
+      <label class="item item-input">
+        <input id="password" type="password" placeholder="Mot de passe" ng-model="dataRegistration.password1" ng-keydown="stopTab($event);">
+      </label>
+    </div>
+    <div class="containerBtnValidate">
+      <button id="validatePassword" class="btnRougePastel"  ng-click="validatePassword()">
+        Suivant<i class="ion-ios-arrow-right"></i>
+      </button>
+    </div>
+  </ion-slide>
+  <ion-slide>
+    <div class="list list-inset">
+      <label class="item item-input">
+        <input id="name" type="text" placeholder="Votre nom" ng-model="dataRegistration.name" ng-keydown="stopTab($event);">
+      </label>
+    </div>
+    <div class="containerBtnValidate">
+      <button class="btnCreateAccount btnRougePastel "  ng-click="create()">
+        Valider
+      </button>
+    </div>
+  </ion-slide>
+</ion-slide-box>

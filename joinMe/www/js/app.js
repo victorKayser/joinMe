@@ -28,7 +28,7 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
 
   $stateProvider
   .state('map', {
-    url: '/',
+    url: '/map',
     templateUrl: 'templates/map.html',
     controller: 'MapCtrl'
   })
@@ -52,7 +52,7 @@ var starter = angular.module('starter', ['ionic', 'ngCordova', 'ngMap'])
   });
   $stateProvider
   .state('home', {
-    url: '/home',
+    url: '/',
     templateUrl: 'templates/home.html',
     controller: 'HomeCtrl'
   });

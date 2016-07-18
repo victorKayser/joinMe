@@ -1,5 +1,5 @@
 
-starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http, $ionicModal) {
+starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordovaContacts, $ionicPlatform, $ionicLoading, $ionicTabsDelegate, $ionicSideMenuDelegate, $ionicPopup, $cordovaToast, $http, $ionicModal, $timeout) {
 
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
 
@@ -7,7 +7,7 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
   $ionicSideMenuDelegate.canDragContent(false);
 
   $scope.gestureClosePopup = function(event) {
-    if (event.target.className !== 'joinMeNow activated') {
+    if (event.target.className === 'containerJoinMeNow activated') {
       $rootScope.modal.hide();
     }
   }
@@ -18,6 +18,7 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
       $scope.checkKnownUsers(allContacts, function(err, res) {
         if (!err) {
           $scope.contacts = res;
+          $rootScope.contacts = res;
           $ionicLoading.hide();
           $scope.renderGroups();
         }
@@ -48,7 +49,7 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
   $scope.renderGroups = function() {
     // si la personne a fait des groups de contacts
     if (typeof(window.localStorage['groups']) !== 'undefined') {
-      $scope.groupObject = JSON.parse(window.localStorage['groups']);
+      $rootScope.groupObject = JSON.parse(window.localStorage['groups']);
     }
   }
 
@@ -85,7 +86,7 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
     $scope.selectedEmoji = emoji;
   }
   // validation when click on button send me now
-  $scope.validateInvitation = function() {
+  $scope.validateInvitation = function(e) {
     // emoji set ?
     if (typeof($scope.emojiIsValidate) !== 'undefined') {
       // contact set ?
@@ -272,11 +273,25 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
   }
   // mobile
   else {
-    // loader
-    $ionicLoading.show({
-      template: '<ion-spinner icon="android"/>'
-    });
-    $scope.renderEmoji();
-    $scope.getAllContacts();
+    if (!$rootScope.viewedInvitationView) {
+      if ($rootScope.contacts) {
+        $scope.contacts = $rootScope.contacts;
+        $scope.renderEmoji();
+      }
+      else {
+        // loader
+        $timeout(function() {
+          $ionicLoading.show({
+            template: '<ion-spinner icon="android"/>'
+          });
+          $scope.getAllContacts();
+          $scope.renderGroups();
+          $scope.renderEmoji();
+        }, 400);
+      }
+      $rootScope.viewedInvitationView = true;
+
+    }
+    $scope.renderGroups();
   }
 });

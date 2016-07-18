@@ -37,40 +37,81 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     window.localStorage['invitationPosition'] = JSON.stringify(posLs);
     //$state.go('invitation');
 
-    $ionicModal.fromTemplateUrl('templates/invitation.html', {
-      id: '1',
-      scope: $scope
-    }).then(function(modal) {
-      $rootScope.modal = modal;
+    if (!$rootScope.modal) {
+      $ionicModal.fromTemplateUrl('templates/invitation.html', {
+        id: '1',
+        scope: $scope
+      }).then(function(modal) {
+        $rootScope.modal = modal;
+        $rootScope.modal.show();
+        $('.joinmeBtn').fadeOut(100);
+      });
+    }
+    else {
       $rootScope.modal.show();
       $('.joinmeBtn').fadeOut(100);
-    });
+    }
+
   };
 
   $scope.openContactModal = function() {
     $('.btnContact').addClass('rotateIcon');
-
-    $ionicModal.fromTemplateUrl('templates/contact.html', {
-      id: '2',
-      scope: $scope
-    }).then(function(modal) {
-      $rootScope.modalContact = modal;
+    if (!$rootScope.modalContact) {
+      $ionicModal.fromTemplateUrl('templates/contact.html', {
+        id: '2',
+        scope: $scope
+      }).then(function(modal) {
+        $rootScope.modalContact = modal;
+        $rootScope.modalContact.show();
+        $('.joinmeBtn').fadeOut(100);
+      });
+    }
+    else {
       $rootScope.modalContact.show();
       $('.joinmeBtn').fadeOut(100);
-    });
+    }
+
+
   };
   $scope.openSettingsModal = function() {
     $('.btnSettings').addClass('rotateIcon');
-
-    $ionicModal.fromTemplateUrl('templates/settings.html', {
-      id: '3',
-      scope: $scope,
-    }).then(function(modal) {
-      $rootScope.modalSettings = modal;
+    if (!$rootScope.modalSettings) {
+      $ionicModal.fromTemplateUrl('templates/settings.html', {
+        id: '3',
+        scope: $scope,
+      }).then(function(modal) {
+        $rootScope.modalSettings = modal;
+        $rootScope.modalSettings.show();
+        $('.joinmeBtn').fadeOut(100);
+      });
+    }
+    else {
       $rootScope.modalSettings.show();
       $('.joinmeBtn').fadeOut(100);
-    });
+    }
   };
+
+  $scope.deconnection = function() {
+    var confirmPopup = $ionicPopup.confirm({
+       title: 'Déconnexion',
+       template: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+       buttons: [
+         {
+           text: 'Non',
+           type: 'btnRougePastel',
+         },
+         {
+           text: 'Oui',
+           onTap: function(e) {
+             $state.go('home');
+             window.localStorage.removeItem('user');
+             window.localStorage.removeItem('groups');
+             window.localStorage.removeItem('registeredUser');
+           }
+         }
+       ]
+     });
+  }
 
 
 
@@ -483,16 +524,12 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
   }
 
 
-  $ionicPlatform.ready(function() {
-
     // si la personne à un compte et est connectée
     if (window.localStorage['user']) {
       if(JSON.parse(window.localStorage['user']) !== null) {
-
         //join la room correspondant à mon id
         var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
         socket.emit('joinMyIdRoom', JSON.parse(window.localStorage['user']).id_users);
-
         if(!new Ionic.IO.Settings().get('isPC')) {
           // INIT PUSH
           $rootScope.push = PushNotification.init({
@@ -572,7 +609,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     else {
       $state.go('home');
     }
-  });
 
   NgMap.getMap().then(function(map) {
     $scope.map = map;
@@ -653,11 +689,11 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           title: 'test',
           draggable: false,
           icon: {
-            path : google.maps.SymbolPath.FORWARD_OPEN_ARROW,
+            path : google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
             // fillColor: '#00b6ff',
             // fillOpacity: 1,
             strokeWeight: 3,
-            strokeColor: '#0c60ee',
+            strokeColor: 'rgb(246, 94, 59)',
             scale: 5,
           }
         });
@@ -669,7 +705,7 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
            title: 'draggable marker',
            draggable: true,
            icon: {
-             url : 'img/marker.png',
+             url : 'img/marker.svg',
              scaledSize: new google.maps.Size(30, 30)
            }
         });

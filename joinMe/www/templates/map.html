@@ -2,11 +2,11 @@
   <ng-map></ng-map>
     <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
     <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><i class="ion-android-locate"></i></button>
-    <button type="button" ng-click="openContactModal()" name="button" class="btnContact"><i class="ion-ios-people-outline"></i></button>
+    <button type="button" ng-click="openContactModal()" name="button" class="btnContact"><i class="ion-person-stalker"></i></button>
     <button type="button" ng-click="openSettingsModal()" name="button" class="btnSettings"><i class="ion-gear-a"></i></button>
-    <button type="button" name="button" class="btnHome"><i class="ion-ios-home-outline"></i></button>
+    <button type="button" ng-click="deconnection()" name="button" class="btnHome"><i class="ion-home"></i></button>
     <div class="containerJoinMeBtn">
-      <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="button joinmeBtn">Join Me</button></a>
+      <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="btnRougePastel joinmeBtn">Join Me</button></a>
     </div>
 
     <input id="pac-input" class="adressInput" type="text" ng-model="address" ng-blur="updateAddress()" ng-focus="disableTap()">
