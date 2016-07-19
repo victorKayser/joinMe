@@ -21,6 +21,40 @@ starter.controller('ContactCtrl', function($scope, $rootScope, $state, $cordovaC
     $scope.popover = popover;
   });
 
+  $scope.invitationBySms = function(contact) {
+
+    var confirmPopup = $ionicPopup.confirm({
+       title: 'Information',
+       template: contact.displayName + ' n\'a pas encore l\'application, voulez vous lui demander de vous rejoindre ?',
+       buttons: [
+         {
+           text: 'Non',
+           type: 'btnRougePastel',
+         },
+         {
+           text: 'Oui',
+           onTap: function(e) {
+             var number = contact.phoneNumbers[0].value;
+             var message = 'Rejoins moi sur la nouvelle application JoinMe, tu peux la télécharger ici : www.joinme.com';
+
+             //CONFIGURATION
+             var options = {
+                 replaceLineBreaks: false, // true to replace \n by a new line, false by default
+                 android: {
+                     intent: 'INTENT'  // send SMS with the native android SMS messaging
+                     //intent: '' // send SMS without open any other app
+                 }
+             };
+
+             var success = function () { };
+             var error = function (e) { console.log('Message Failed:' + e); };
+             sms.send(number, message, options, success, error);
+           }
+         }
+       ]
+     });
+  }
+
 
   $scope.checkKnownUsers = function (contacts, done) {
     var filterContact = [];

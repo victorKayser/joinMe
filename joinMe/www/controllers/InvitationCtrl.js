@@ -60,10 +60,10 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
     $scope.objEmojiRaw2 = [];
 
     for(i=1; i<=numberEmoji; i=i+2) {
-      $scope.objEmojiRaw1.push(i+'.png');
+      $scope.objEmojiRaw1.push(i+'.svg');
     }
     for(i=2; i<=numberEmoji; i=i+2) {
-      $scope.objEmojiRaw2.push(i+'.png');
+      $scope.objEmojiRaw2.push(i+'.svg');
     }
   };
   // event on the left swipe in the tabs

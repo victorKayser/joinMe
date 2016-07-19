@@ -1,10 +1,10 @@
 <ion-view hide-back-button="true" hide-nav-bar="true" view-title="JoinMe">
   <ng-map></ng-map>
     <button ng-show="showClosePendingInvitation" ng-click="stopInvitation()" type="button" name="button" class="closePendingInvitation"><i class="ion-close-round"></i></button>
-    <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><i class="ion-android-locate"></i></button>
-    <button type="button" ng-click="openContactModal()" name="button" class="btnContact"><i class="ion-person-stalker"></i></button>
-    <button type="button" ng-click="openSettingsModal()" name="button" class="btnSettings"><i class="ion-gear-a"></i></button>
-    <button type="button" ng-click="deconnection()" name="button" class="btnHome"><i class="ion-home"></i></button>
+    <button ng-click="recenterOnMe()" type="button" name="button" class="recenterOnMe"><img src="img/recenter.svg" alt="" /></button>
+    <button type="button" ng-click="openContactModal()" name="button" class="btnContact"><img src="img/people.svg" alt="" /></button>
+    <button type="button" ng-click="openSettingsModal()" name="button" class="btnSettings"><img src="img/gear.svg" alt="" /></button>
+    <button type="button" ng-click="deconnection()" name="button" class="btnHome"><img src="img/home.svg" alt="" /></button>
     <div class="containerJoinMeBtn">
       <a ng-hide="showDirection === true" ng-click="storePositionInvitation()"><button class="btnRougePastel joinmeBtn">Join Me</button></a>
     </div>

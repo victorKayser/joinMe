@@ -8,6 +8,9 @@ starter.controller('HomeCtrl', function($scope, $state, phoneFormatter, $rootSco
       $state.go('map');
     }
   }
+  else {
+    $('.homeView').css('opacity', '1');
+  }
 
   $scope.createAccount = function() {
     $state.go('registration');

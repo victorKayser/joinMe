@@ -1,7 +1,6 @@
 starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $timeout, $ionicPopup, $ionicPlatform, $ionicSideMenuDelegate, $ionicModal) {
   //arrivée sur l'appli
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
-
   $scope.guestMarker = [];
   $scope.bounds = new google.maps.LatLngBounds();
   $scope.leavedGuest = [];
@@ -103,6 +102,9 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
          {
            text: 'Oui',
            onTap: function(e) {
+             $scope.markerLocalisationDraggable.setMap(null);
+             $scope.markerLocalisation.setMap(null);
+             $('.homeView').css('opacity', '1');
              $state.go('home');
              window.localStorage.removeItem('user');
              window.localStorage.removeItem('groups');
@@ -140,7 +142,9 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     }
     else {
       $('.infosMap').addClass('hideInfosMap');
-      $('.chevronInfosBar').addClass('hideBandeau');
+      $timeout(function(){
+        $('.chevronInfosBar').addClass('hideBandeau');
+      }, 300);
     }
 
   }

@@ -9734,28 +9734,17 @@ a.button {
 ng-map {
   height: 100%; }
 
-.hamburgerIcon {
-  font-size: 25px;
-  height: 50px;
-  width: 50px;
-  color: #f65e3b;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 50px;
-  border: solid 1px gray;
-  position: absolute;
-  top: 115px;
-  left: 5px;
-  transition: transform 2s;
-  -webkit-transition: transform 2s; }
-
 .rotateIcon {
   transform: rotate(360deg); }
 
 .infosMap {
   height: 150px;
+  border-radius: 25px 25px 0px 0px;
   padding-top: 5px;
   background-color: #faf8ef;
-  border-top: 5px solid #8f7a66;
+  border-top: 3px solid #8f7a66;
+  border-left: 3px solid #8f7a66;
+  border-right: 3px solid #8f7a66;
   width: 100%;
   position: absolute;
   bottom: -150px;
@@ -9765,7 +9754,7 @@ ng-map {
   .infosMap i.chevron {
     font-size: 25px;
     position: absolute;
-    right: 5px;
+    right: 12px;
     top: 5px; }
 
 .visible {
@@ -9778,7 +9767,7 @@ ng-map {
 
 .hideBandeau {
   opacity: 100 !important;
-  top: -40px !important; }
+  top: -50px !important; }
 
 .chevronInfosBar {
   opacity: 0;
@@ -9786,10 +9775,10 @@ ng-map {
   top: 0px;
   left: 0;
   background-color: rgba(250, 248, 239, 0.7);
-  border-top: 5px solid #8f7a66;
+  border-top: 3px solid #8f7a66;
   width: 100%;
-  height: 40px;
-  line-height: 35px;
+  height: 43px;
+  line-height: 43px;
   transition: opacity 0.3s;
   -webkit-transition: opacity 0.3s; }
   .chevronInfosBar i {
@@ -9800,26 +9789,27 @@ ng-map {
     -webkit-transition: bottom 0.5s; }
 
 div.transport {
-  background-color: #f2b179;
+  background-color: #faf8ef;
   height: 40px;
   width: 40px;
   display: block;
   text-align: center;
   border-radius: 150px;
-  padding-top: 6px;
+  padding-top: 4px;
   position: relative;
   margin-top: 5px;
   margin-left: 5px;
-  border: solid 2px #8f7a66; }
+  border: solid 3px #f65e3b; }
   div.transport .ion-android-walk {
     margin-left: 2px; }
 
 .accept {
-  background-color: #73ed63;
+  border: 3px solid #73ed63;
+  background-color: #faf8ef;
   border-radius: 100px;
   width: 60px;
   height: 60px;
-  padding: 18px;
+  padding-top: 15px;
   text-align: center;
   position: absolute;
   right: 15px;
@@ -9827,12 +9817,13 @@ div.transport {
   display: inline-block; }
 
 .refuse {
-  background-color: #f65e3b;
+  border: 3px solid #f65e3b;
+  background-color: #faf8ef;
   border-radius: 100px;
   width: 60px;
   text-align: center;
   height: 60px;
-  padding: 18px;
+  padding-top: 15px;
   position: absolute;
   right: 80px;
   bottom: 15px; }
@@ -9927,7 +9918,7 @@ span.transport {
   margin-top: 10px; }
 
 .eachEmoji {
-  padding: 8px; }
+  width: 27px; }
 
 .modalInvitation {
   background-color: #faf8ef;
@@ -9943,7 +9934,8 @@ ion-modal-view {
   border-radius: 25px; }
 
 .selected {
-  background-color: #f65e3b !important; }
+  background-color: #f65e3b !important;
+  border-color: #8f7a66 !important; }
 
 .spinner svg {
   width: 28px;
@@ -9975,7 +9967,7 @@ ion-modal-view {
   .contact .tab-nav.tabs {
     margin-top: 0;
     top: 0;
-    border-radius: 15px 15px 0 0; }
+    border-radius: 20px 20px 0 0; }
 
 .ion-gear-a,
 .ion-ios-arrow-back {
@@ -10063,7 +10055,7 @@ ion-modal-view {
   width: 45px;
   height: 45px;
   background-color: rgba(250, 248, 239, 0.7);
-  border: solid 3px #8f7a66;
+  border: solid 3px #f65e3b;
   border-radius: 50px; }
   .closePendingInvitation i {
     font-size: 25px; }
@@ -10072,7 +10064,6 @@ ion-modal-view {
   font-size: 30px; }
 
 .recenterOnMe {
-  font-size: 25px;
   position: absolute;
   top: 115px;
   left: 5px;
@@ -10081,9 +10072,13 @@ ion-modal-view {
   background-color: rgba(250, 248, 239, 0.7);
   border-radius: 50px;
   border: solid 3px #f65e3b; }
+  .recenterOnMe img {
+    width: 27px;
+    margin-top: 4px; }
+  .recenterOnMe:active {
+    background-color: rgba(143, 122, 102, 0.7); }
 
 .btnContact {
-  font-size: 25px;
   position: absolute;
   top: 235px;
   right: 5px;
@@ -10094,9 +10089,10 @@ ion-modal-view {
   border: solid 3px #f65e3b;
   transition: transform 1s;
   -webkit-transition: transform 1s; }
+  .btnContact:active {
+    background-color: rgba(143, 122, 102, 0.7); }
 
 .btnSettings {
-  font-size: 25px;
   text-align: center;
   position: absolute;
   top: 175px;
@@ -10108,6 +10104,10 @@ ion-modal-view {
   border: solid 3px #f65e3b;
   transition: transform 1s;
   -webkit-transition: transform 1s; }
+  .btnSettings img {
+    margin-top: 4px; }
+  .btnSettings:active {
+    background-color: rgba(143, 122, 102, 0.7); }
 
 .btnHome {
   font-size: 25px;
@@ -10119,6 +10119,10 @@ ion-modal-view {
   background-color: rgba(250, 248, 239, 0.7);
   border-radius: 50px;
   border: solid 3px #f65e3b; }
+  .btnHome img {
+    margin-top: 2px; }
+  .btnHome:active {
+    background-color: rgba(143, 122, 102, 0.7); }
 
 .ion-android-locate {
   font-size: 25px;
@@ -10200,7 +10204,10 @@ i.item-sideMenu {
   margin-right: 10px; }
 
 .contactOptions {
-  width: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
+  width: 30px;
+  height: 30px;
   position: absolute;
   right: 15px;
   top: 40%; }
@@ -10220,6 +10227,7 @@ i.item-sideMenu {
     height: inherit; }
 
 .homeView {
+  opacity: 0;
   background-color: #faf8ef; }
   .homeView .item-input {
     background-color: #eee4da;
@@ -10341,3 +10349,18 @@ h2.appTitle {
 
 .tabs-striped.tabs-positive .tab-item.tab-item-active, .tabs-striped.tabs-positive .tab-item.active, .tabs-striped.tabs-positive .tab-item.activated {
   border-color: #8f7a66; }
+
+i.iconPeopleTab, i.iconPersonTab {
+  height: 100% !important; }
+
+.iconPeopleTab {
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-image: url("../img/people.svg");
+  background-size: 25px !important; }
+
+.iconPersonTab {
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-image: url("../img/person.svg");
+  background-size: 25px !important; }

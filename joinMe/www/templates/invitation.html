@@ -13,7 +13,7 @@
       </ion-scroll>
 
       <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
-        <ion-tab icon="ion-ios-person-outline" >
+        <ion-tab icon="iconPersonTab" >
           <ion-nav-view name="home-tab" class="item-menu">
             <div ng-repeat="model in contacts | orderBy:'displayName'">
               <ion-checkbox id="{{model.phoneNumbers}}" class="aloneContact" ng-if="model.displayName !== '' && model.phoneNumbers !== null && model.isRegistered === true" ng-model='checkStatus' ng-click='doIfChecked(checkStatus, model.phoneNumbers[0].value)'>
@@ -22,7 +22,7 @@
             </div>
           </ion-nav-view>
         </ion-tab>
-        <ion-tab icon="ion-ios-people-outline">
+        <ion-tab icon="iconPeopleTab">
           <ion-nav-view name="menu-tab" class="item-menu">
             <div ng-repeat="eachGroup in groupObject | unique:'group'">
               <ion-checkbox class="group" ng-model='groupState' ng-click='selectContactFromGroup(eachGroup.group, groupState)'>

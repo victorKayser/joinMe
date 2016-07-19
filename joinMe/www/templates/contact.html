@@ -1,7 +1,7 @@
 <ion-modal-view ng-controller="ContactCtrl" class="contact">
   <ion-content>
     <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
-      <ion-tab icon="ion-ios-person-outline" >
+      <ion-tab icon="iconPersonTab" >
         <ion-nav-view name="home-tab" class="item-menu">
           <div ng-repeat="model in contacts | orderBy:['-isRegistered','displayName']">
             <ion-list ng-if="model.displayName !== '' && model.phoneNumbers !== null">
@@ -15,7 +15,7 @@
                 <div class="nameContact">{{model.displayName}}</div>
                 <i ng-click="showPopoverContactOptions(model, $event)" class="contactOptions ion-android-more-vertical"></i>
               </ion-item>
-              <ion-item class="itemContact" ng-if="model.isRegistered !== true">
+              <ion-item class="itemContact" ng-if="model.isRegistered !== true" ng-click="invitationBySms(model)">
                 <img src="img/ionic.png" class="contactImg" alt="" />
                 <div class="nameContact">{{model.displayName}}</div>
                 <i class="plusContactIcon ion-android-add"></i>
@@ -24,7 +24,7 @@
           </div>
         </ion-nav-view>
       </ion-tab>
-      <ion-tab icon="ion-ios-people-outline">
+      <ion-tab icon="iconPeopleTab">
         <ion-nav-view name="menu-tab" class="item-menu">
           <div ng-repeat="eachGroup in groupObject | unique:'group'">
             <ion-list>

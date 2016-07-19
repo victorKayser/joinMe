@@ -40,15 +40,15 @@ starter.controller('SettingsCtrl', function($scope, $state, NgMap, $cordovaGeolo
           .then(function(result) {
             // Upload Success!
             // affiche image
-            var image = document.getElementById('profil-picture');
-            image.src = new Ionic.IO.Settings().get('serverUploadDirectory') + uniqFileName + '.jpeg';
-            if (image.width > image.height) {
-              image.style.removeProperty('width');
-              image.style.height = "100%";
+            var path = new Ionic.IO.Settings().get('serverUploadDirectory') + uniqFileName + '.jpeg';
+            $('.profil-picture').attr('src', path);
+            if ($('.profil-picture').width() > $('.profil-picture').height()) {
+              $('.profil-picture').css('width', '');
+              $('.profil-picture').css('height', '100%');
             }
             else {
-              image.style.removeProperty('height');
-              image.style.width = "100%";
+              $('.profil-picture').css('height', '');
+              $('.profil-picture').css('width', '100%');
             }
             $ionicLoading.hide();
 
