@@ -1,4 +1,4 @@
-starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $timeout, $ionicPopup, $ionicPlatform, $ionicSideMenuDelegate, $ionicModal) {
+starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocation, $stateParams, $http, $rootScope, $cordovaToast, getUserInfosByPhone, $cordovaDeviceOrientation, $timeout, $ionicPopup, $ionicPlatform, $ionicSideMenuDelegate, $ionicModal, $cordovaCamera, $ionicLoading, $cordovaFile, $cordovaFileTransfer) {
   //arrivée sur l'appli
   var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
   $scope.guestMarker = [];
@@ -8,86 +8,198 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
 
   $ionicSideMenuDelegate.canDragContent(false);
 
-  // hack pour utiliser l'autocomplésion sur mobile
-  $scope.disableTap = function(){
-    container = document.getElementsByClassName('pac-container');
-    // disable ionic data tab
-    angular.element(container).attr('data-tap-disabled', 'true');
-    // leave input field if google-address-entry is selected
-    angular.element(container).on("click", function(){
-        document.getElementById('searchBar').blur();
+  //event click join me button
+  $scope.storePositionInvitation = function() {
+    var lat = $scope.markerLocalisation.getPosition().lat();
+    var lng = $scope.markerLocalisation.getPosition().lng();
+    var posLs = lat + ', ' + lng;
+    window.localStorage['invitationPosition'] = JSON.stringify(posLs);
+
+    // camera
+    var optionsCamera = {
+       quality: 50,
+       destinationType: Camera.DestinationType.FILE_URI,
+       correctOrientation:true
+    };
+    // obtient la picture
+    $cordovaCamera.getPicture(optionsCamera).then(function(imageData) {
+      // loader
+      $ionicLoading.show({
+        template: '<ion-spinner icon="android"/>'
+      });
+      // redimentionne l'image
+      $scope.resizeImage(imageData, function(url_resized) {
+
+        var uniqFileName = $scope.guid();
+        var url = new Ionic.IO.Settings().get('serverUploadFilePath');
+        var targetPath = url_resized;
+        var options = {
+          fileName: uniqFileName,
+        };
+        // upload
+        $cordovaFileTransfer.upload(url, targetPath, options)
+        .then(function(result) {
+          // Upload Success!
+          if (!$rootScope.modal) {
+            $ionicModal.fromTemplateUrl('templates/invitation.html', {
+              id: '1',
+              scope: $scope
+            }).then(function(modal) {
+              $rootScope.modal = modal;
+              $rootScope.modal.show();
+              $('.joinmeBtn').fadeOut(100);
+              // affiche image
+              var path = new Ionic.IO.Settings().get('serverUploadDirectory') + uniqFileName + '.jpeg';
+              $('.imgInvitation').attr('src', path);
+              if ($('.imgInvitation').width() > $('.imgInvitation').height()) {
+                $('.imgInvitation').css('width', '');
+                $('.imgInvitation').css('height', '100%');
+              }
+              else {
+                $('.imgInvitation').css('height', '');
+                $('.imgInvitation').css('width', '100%');
+              }
+              $ionicLoading.hide();
+            });
+          }
+          else {
+            $rootScope.modal.show();
+            $('.joinmeBtn').fadeOut(100);
+            // affiche image
+            var path = new Ionic.IO.Settings().get('serverUploadDirectory') + uniqFileName + '.jpeg';
+            $('.imgInvitation').attr('src', path);
+            if ($('.imgInvitation').width() > $('.imgInvitation').height()) {
+              $('.imgInvitation').css('width', '');
+              $('.imgInvitation').css('height', '100%');
+            }
+            else {
+              $('.imgInvitation').css('height', '');
+              $('.imgInvitation').css('width', '100%');
+            }
+            $ionicLoading.hide();
+          }
+        }, function(err) {
+          console.log(err);
+          // Error
+        }, function (progress) {
+          console.log(progress);
+          // constant progress updates
+        });
+      });
+    }, function(err) {
+      // error
     });
   };
 
-  $scope.resetInputAddress = function() {
-    $('#pac-input').val('');
-    $scope.markerLocalisationDraggable.setPosition(new google.maps.LatLng($scope.myLat, $scope.myLng));
-    $scope.map.panTo(
-       new google.maps.LatLng($scope.myLat, $scope.myLng)
-    );
-    $scope.dragedMarker = false;
-  }
-
-  //event click join me button
-  $scope.storePositionInvitation = function() {
-    var lat = $scope.markerLocalisationDraggable.getPosition().lat();
-    var lng = $scope.markerLocalisationDraggable.getPosition().lng();
-    var posLs = lat + ', ' + lng;
-    window.localStorage['invitationPosition'] = JSON.stringify(posLs);
-    //$state.go('invitation');
-
-    if (!$rootScope.modal) {
-      $ionicModal.fromTemplateUrl('templates/invitation.html', {
-        id: '1',
-        scope: $scope
-      }).then(function(modal) {
-        $rootScope.modal = modal;
-        $rootScope.modal.show();
-        $('.joinmeBtn').fadeOut(100);
-      });
+  $scope.guid = function () {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
     }
-    else {
-      $rootScope.modal.show();
-      $('.joinmeBtn').fadeOut(100);
-    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +s4() + '-' + s4() + s4() + s4();
+  };
 
+  $scope.resizeImage = function(url, callback) {
+
+      if (url === ''){
+          callback(null);
+      }
+      var sourceImage = new Image();
+
+      sourceImage.onload = function() {
+          // Create a canvas with the desired dimensions
+          var ratio = sourceImage.height/sourceImage.width;
+          var canvas = document.createElement('canvas');
+          if (ratio > 1) {// portrait
+              canvas.width = 800/ratio;
+              canvas.height = 800;
+          }
+          else {
+              canvas.width = 800;
+              canvas.height = 800*ratio;
+          }
+          // Scale and draw the source image to the canvas
+          canvas.getContext('2d').drawImage(sourceImage, 0, 0, canvas.width, canvas.height);
+
+          callback(canvas.toDataURL('image/jpeg', 0.6));
+      };
+      sourceImage.src = url;
   };
 
   $scope.openContactModal = function() {
     $('.btnContact').addClass('rotateIcon');
-    if (!$rootScope.modalContact) {
-      $ionicModal.fromTemplateUrl('templates/contact.html', {
-        id: '2',
-        scope: $scope
-      }).then(function(modal) {
-        $rootScope.modalContact = modal;
+    $('.menuTransparent').removeClass('visible');
+    $('.btnOpenMenu').removeClass('rotateIcon270');
+    if (!$('.infosMap').hasClass('hideInfosMap') && $('.infosMap').hasClass('visible')) {
+      $('.infosMap').addClass('hideInfosMap');
+      $('.chevronInfosBar').addClass('hideBandeau');
+    }
+    $timeout(function(){
+      if (!$rootScope.modalContact) {
+        $ionicModal.fromTemplateUrl('templates/contact.html', {
+          id: '2',
+          scope: $scope
+        }).then(function(modal) {
+          $rootScope.modalContact = modal;
+          $rootScope.modalContact.show();
+          $('.joinmeBtn').fadeOut(100);
+        });
+      }
+      else {
         $rootScope.modalContact.show();
         $('.joinmeBtn').fadeOut(100);
-      });
-    }
-    else {
-      $rootScope.modalContact.show();
-      $('.joinmeBtn').fadeOut(100);
-    }
+      }
+    }, 1000);
+  };
 
+  $scope.hideMenuTransparent = function(event) {
+    if ((event.target.className === "menuTransparent visible activated") || ((event.target.className === "containerBtnMenu"))) {
+      $('.btnContact').removeClass('visible');
+      $('.btnSettings').removeClass('visible');
+      $('.btnHome').removeClass('visible');
+      $('.btnOpenMenu').removeClass('rotateIcon270');
+      $timeout(function(){
+        $('.menuTransparent').removeClass('visible');
+      }, 500);
+    }
+  };
+
+  $scope.openMenu = function() {
+    $('.menuTransparent').addClass('visible');
+    $('.btnOpenMenu').addClass('rotateIcon270');
+    $timeout(function(){
+      $('.btnContact').addClass('visible');
+      $('.btnSettings').addClass('visible');
+      $('.btnHome').addClass('visible');
+    },300);
 
   };
+
   $scope.openSettingsModal = function() {
     $('.btnSettings').addClass('rotateIcon');
-    if (!$rootScope.modalSettings) {
-      $ionicModal.fromTemplateUrl('templates/settings.html', {
-        id: '3',
-        scope: $scope,
-      }).then(function(modal) {
-        $rootScope.modalSettings = modal;
+    $('.menuTransparent').removeClass('visible');
+    $('.btnOpenMenu').removeClass('rotateIcon270');
+    if (!$('.infosMap').hasClass('hideInfosMap') && $('.infosMap').hasClass('visible')) {
+      $('.infosMap').addClass('hideInfosMap');
+      $('.chevronInfosBar').addClass('hideBandeau');
+    }
+    $timeout(function(){
+      if (!$rootScope.modalSettings) {
+        $ionicModal.fromTemplateUrl('templates/settings.html', {
+          id: '3',
+          scope: $scope,
+        }).then(function(modal) {
+          $rootScope.modalSettings = modal;
+          $rootScope.modalSettings.show();
+          $('.joinmeBtn').fadeOut(100);
+        });
+      }
+      else {
         $rootScope.modalSettings.show();
         $('.joinmeBtn').fadeOut(100);
-      });
-    }
-    else {
-      $rootScope.modalSettings.show();
-      $('.joinmeBtn').fadeOut(100);
-    }
+      }
+    },1000);
   };
 
   $scope.deconnection = function() {
@@ -102,7 +214,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
          {
            text: 'Oui',
            onTap: function(e) {
-             $scope.markerLocalisationDraggable.setMap(null);
              $scope.markerLocalisation.setMap(null);
              $('.homeView').css('opacity', '1');
              $state.go('home');
@@ -114,7 +225,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
        ]
      });
   }
-
 
 
   $scope.$on('modal.hidden', function(event, modal) {
@@ -318,8 +428,22 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         $scope.invitationId = invitationId;
         $scope.senderName = guest;
         $scope.emojiPath = invitation.data[0].emoji_path;
+        $(".imgInvitation").load(function() {
+          if ($('.imgInvitation').width() > $('.imgInvitation').height()) {
+            $('.imgInvitation').css('width', '');
+            $('.imgInvitation').css('height', '100%');
+          }
+          else {
+            $('.imgInvitation').css('height', '');
+            $('.imgInvitation').css('width', '100%');
+          }
+        });
 
         NgMap.getMap().then(function(map) {
+          var infowindowSender = new google.maps.InfoWindow({
+            content: '<span>' + $scope.senderName + '</span><div class="containerImgInvitationInfoWindow"><img class="imgInvitation" src="" alt="" /></div>'
+          });
+
           // crée le marker du sender
           $scope.markerSender = new google.maps.Marker({
              position: {lat: senderLat, lng: senderLng},
@@ -330,6 +454,10 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
                url : senderImg,
                scaledSize: new google.maps.Size(25, 25)
              }
+          });
+          $scope.markerSender.addListener('click', function() {
+            infowindowSender.open(map, $scope.markerSender);
+            $('.imgInvitation').attr('src', $scope.emojiPath);
           });
           // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
           $scope.bounds.extend($scope.markerSender.position);
@@ -497,7 +625,22 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
             $scope.senderName = sender;
 
             $scope.emojiPath = invitation.data[0].emoji_path;
+            $(".imgInvitation").load(function() {
+              if ($('.imgInvitation').width() > $('.imgInvitation').height()) {
+                $('.imgInvitation').css('width', '');
+                $('.imgInvitation').css('height', '100%');
+              }
+              else {
+                $('.imgInvitation').css('height', '');
+                $('.imgInvitation').css('width', '100%');
+              }
+            });
             NgMap.getMap().then(function(map) {
+
+              var infowindowSender = new google.maps.InfoWindow({
+                content: '<span>' + $scope.senderName + '</span><div class="containerImgInvitationInfoWindow"><img class="imgInvitation" src="" alt="" /></div>'
+              });
+
               // crée le marker du sender
               $scope.markerSender = new google.maps.Marker({
                  position: {lat: senderLat, lng: senderLng},
@@ -508,6 +651,10 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
                    url : senderImg,
                    scaledSize: new google.maps.Size(25, 25)
                  }
+              });
+              $scope.markerSender.addListener('click', function() {
+                infowindowSender.open(map, $scope.markerSender);
+                $('.imgInvitation').attr('src', $scope.emojiPath);
               });
               // ajoute a l'objet bounds le marker pour pouvoir zoomer automatiquement en fonction des markers
               $scope.bounds.extend($scope.markerSender.position);
@@ -535,73 +682,75 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         var socket = io(new Ionic.IO.Settings().get('serverSocketUrl'));
         socket.emit('joinMyIdRoom', JSON.parse(window.localStorage['user']).id_users);
         if(!new Ionic.IO.Settings().get('isPC')) {
-          // INIT PUSH
-          $rootScope.push = PushNotification.init({
-              android: {
-                  senderID : new Ionic.IO.Settings().get('senderId')
-              },
-              ios: {
-                  alert: "true",
-                  badge: "true",
-                  sound: "true"
-              }
-          });
-          $rootScope.push.on('registration', function(data) {
-            var registrationId = data.registrationId;
-            var user_id =  JSON.parse(window.localStorage['user']).id_users;
-            var OS = ionic.Platform.platform();
-            // met en bdd pour l'user en question le token de push ainsi que son device (ios ou android)
-            $http.post(new Ionic.IO.Settings().get('serverUrl') + '/setPushInfos',
-            {
-              id : user_id,
-              token: registrationId,
-              os: OS,
-            })
-            .then(function successCallback(contactsChecked) {
-              $rootScope.push.on('notification', function(data) {
-                  // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
-                  if (typeof data.additionalData.invitationId !== 'undefined') {
-                    // si on n'est pas deja entrain de rejoindre quelqu'un
-                    if (!$scope.emitGuessPosition) {
-                      // si on a pas deja recu l'info via le socket
-                      if (parseFloat($scope.alreadyGetInvitation) !== parseFloat(data.additionalData.invitationId)) {
-                        getInvitation(data.additionalData.invitationId, data.additionalData.sender_phoneNumber);
+          ionic.Platform.ready(function(){
+            // INIT PUSH
+            $rootScope.push = PushNotification.init({
+                android: {
+                    senderID : new Ionic.IO.Settings().get('senderId')
+                },
+                ios: {
+                    alert: "true",
+                    badge: "true",
+                    sound: "true"
+                }
+            });
+            $rootScope.push.on('registration', function(data) {
+              var registrationId = data.registrationId;
+              var user_id =  JSON.parse(window.localStorage['user']).id_users;
+              var OS = ionic.Platform.platform();
+              // met en bdd pour l'user en question le token de push ainsi que son device (ios ou android)
+              $http.post(new Ionic.IO.Settings().get('serverUrl') + '/setPushInfos',
+              {
+                id : user_id,
+                token: registrationId,
+                os: OS,
+              })
+              .then(function successCallback(contactsChecked) {
+                $rootScope.push.on('notification', function(data) {
+                    // quand notif pour nouvelle invit, on ajoute la marker du sender sur la map
+                    if (typeof data.additionalData.invitationId !== 'undefined') {
+                      // si on n'est pas deja entrain de rejoindre quelqu'un
+                      if (!$scope.emitGuessPosition) {
+                        // si on a pas deja recu l'info via le socket
+                        if (parseFloat($scope.alreadyGetInvitation) !== parseFloat(data.additionalData.invitationId)) {
+                          getInvitation(data.additionalData.invitationId, data.additionalData.sender_phoneNumber);
+                        }
                       }
                     }
-                  }
-                  // invitation terminée a l'inivitative du sender
-                  else if(typeof data.additionalData.senderCloseInvitation !== 'undefined') {
-                    if (parseFloat($scope.invitationClosed) !== parseFloat(data.additionalData.leavedInvitation)) {
-                      var senderPhoneNumber = data.additionalData.senderPhoneNumber;
+                    // invitation terminée a l'inivitative du sender
+                    else if(typeof data.additionalData.senderCloseInvitation !== 'undefined') {
+                      if (parseFloat($scope.invitationClosed) !== parseFloat(data.additionalData.leavedInvitation)) {
+                        var senderPhoneNumber = data.additionalData.senderPhoneNumber;
+                        var leavedInvitation = data.additionalData.leavedInvitation;
+                        senderCloseInvitation(senderPhoneNumber, leavedInvitation);
+                        $timeout(function(){
+                          checkGuestPendingInvitation($scope.myLat, $scope.myLng);
+                        }, 5000);
+                      }
+                    }
+                    // invitation terminée a l'inivitative de l'invité
+                    else if(typeof data.additionalData.guestCloseInvitation !== 'undefined') {
+                      var guestPhoneNumber = data.additionalData.guestPhoneNumber;
+                      var remainingGuestNumber = data.additionalData.remainingGuestNumber;
                       var leavedInvitation = data.additionalData.leavedInvitation;
-                      senderCloseInvitation(senderPhoneNumber, leavedInvitation);
-                      $timeout(function(){
-                        checkGuestPendingInvitation($scope.myLat, $scope.myLng);
-                      }, 5000);
+                      if (($scope.leavedGuest.indexOf(guestPhoneNumber) === -1) && (!$scope.invitationClosedCauseEmpty)) {
+                        guestCloseInvitation(guestPhoneNumber, remainingGuestNumber, leavedInvitation);
+                      }
                     }
-                  }
-                  // invitation terminée a l'inivitative de l'invité
-                  else if(typeof data.additionalData.guestCloseInvitation !== 'undefined') {
-                    var guestPhoneNumber = data.additionalData.guestPhoneNumber;
-                    var remainingGuestNumber = data.additionalData.remainingGuestNumber;
-                    var leavedInvitation = data.additionalData.leavedInvitation;
-                    if (($scope.leavedGuest.indexOf(guestPhoneNumber) === -1) && (!$scope.invitationClosedCauseEmpty)) {
-                      guestCloseInvitation(guestPhoneNumber, remainingGuestNumber, leavedInvitation);
+                    // un invité a accepté l'invitation
+                    else if(typeof data.additionalData.guestIsComming !== 'undefined') {
+                      if (typeof getUserInfosByPhone.getInfos(data.additionalData.guestPhone) !== 'undefined') {
+                        guest = getUserInfosByPhone.getInfos(data.additionalData.guestPhone).displayName;
+                      }
+                      else {
+                        guest = data.additionalData.guestPhone;
+                      }
+                      $cordovaToast.showShortBottom(guest + ' a accepté votre invitation.');
                     }
-                  }
-                  // un invité a accepté l'invitation
-                  else if(typeof data.additionalData.guestIsComming !== 'undefined') {
-                    if (typeof getUserInfosByPhone.getInfos(data.additionalData.guestPhone) !== 'undefined') {
-                      guest = getUserInfosByPhone.getInfos(data.additionalData.guestPhone).displayName;
-                    }
-                    else {
-                      guest = data.additionalData.guestPhone;
-                    }
-                    $cordovaToast.showShortBottom(guest + ' a accepté votre invitation.');
-                  }
+                });
+              }
+              , function errorCallback(err) {
               });
-            }
-            , function errorCallback(err) {
             });
           });
         }
@@ -621,11 +770,13 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
     map.setOptions({disableDefaultUI: true});
 
     // Init des variables pour les directions et le temps de voyage
-    $scope.directionsDisplay = new google.maps.DirectionsRenderer();
+    $scope.directionsDisplay = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "rgb(246, 94, 59)", strokeWeight: 8, strokeOpacity: 0.7, } });
     $scope.directionsService = new google.maps.DirectionsService();
     $scope.service = new google.maps.DistanceMatrixService();
     $scope.directionsDisplay.setMap(map);
-    $scope.directionsDisplay.setOptions( { suppressMarkers: true } );
+    $scope.directionsDisplay.setOptions({
+      suppressMarkers: true
+    });
 
     // évenement de map lorsqu'on drag (swipe sur la map pour change la direction)
     map.addListener('drag', function() {
@@ -694,84 +845,13 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
           draggable: false,
           icon: {
             path : google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-            // fillColor: '#00b6ff',
-            // fillOpacity: 1,
             strokeWeight: 3,
             strokeColor: 'rgb(246, 94, 59)',
             scale: 5,
           }
         });
 
-        //init the draggable marker for invitation
-        $scope.markerLocalisationDraggable = new google.maps.Marker({
-           position: {lat: lat, lng: lng},
-           map: map,
-           title: 'draggable marker',
-           draggable: true,
-           icon: {
-             url : 'img/marker.svg',
-             scaledSize: new google.maps.Size(30, 30)
-           }
-        });
-
         $scope.bounds.extend($scope.markerLocalisation.position);
-        $scope.bounds.extend($scope.markerLocalisationDraggable.position);
-
-        // quand on drag le marker on met a jour l'adresse
-        google.maps.event.addListener($scope.markerLocalisationDraggable, 'dragend', function(res) {
-          $scope.dragedMarker = true;
-
-           geocoder = new google.maps.Geocoder();
-           geocoder.geocode
-            ({
-                latLng: $scope.markerLocalisationDraggable.getPosition()
-            },
-                function(results, status)
-                {
-                    if (status == google.maps.GeocoderStatus.OK)
-                    {
-                        $scope.address = results[0].formatted_address;
-                        $scope.$apply();
-                    }
-                    else
-                    {
-                    }
-                }
-            );
-        });
-
-        // gestion de l'autocomplétion de la bar de recherche d'adresse
-        var input = document.getElementById('pac-input');
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-        var autocomplete = new google.maps.places.Autocomplete(input);
-
-        autocomplete.addListener('place_changed', function() {
-          var place = autocomplete.getPlace();
-          $scope.markerLocalisationDraggable.setPosition(place.geometry.location);
-          $scope.bounds.extend($scope.markerLocalisationDraggable.position);
-          $scope.stopRecenterOnMyPosition = true;
-          $scope.dragedMarker = true;
-
-          if (!place.geometry) {
-            window.alert("Autocomplete's returned place contains no geometry");
-            return;
-          }
-
-          // If the place has a geometry, then present it on a map.
-          if (place.geometry.viewport) {
-            map.fitBounds($scope.bounds);
-          } else {
-          }
-
-          var address = '';
-          if (place.address_components) {
-            address = [
-              (place.address_components[0] && place.address_components[0].short_name || ''),
-              (place.address_components[1] && place.address_components[1].short_name || ''),
-              (place.address_components[2] && place.address_components[2].short_name || '')
-            ].join(' ');
-          }
-        });
 
         // start the watcher for phone orientation
         var options = {
@@ -795,7 +875,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
         //   $state.go('invitation');
         // });
         $scope.bounds.extend($scope.markerLocalisation.position);
-        $scope.bounds.extend($scope.markerLocalisationDraggable.position);
 
         // si il y a le marker du sender, c'est qu'on vient depuis la notif
         if (typeof $scope.markerSender !== 'undefined') {
@@ -941,10 +1020,6 @@ starter.controller('MapCtrl', function($scope, $state, NgMap, $cordovaGeolocatio
            // modify the position of the marker
            var newlatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
            $scope.markerLocalisation.setPosition(newlatlng);
-
-           if (!$scope.dragedMarker) {
-             $scope.markerLocalisationDraggable.setPosition(newlatlng);
-           }
 
            if ($scope.emitGuessPosition) {
              //donne au sender ma position

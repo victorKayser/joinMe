@@ -53,19 +53,6 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
     }
   }
 
-  // render 2 objets (number.png) for two rows of emoji
-  $scope.renderEmoji = function() {
-    var numberEmoji = 25;
-    $scope.objEmojiRaw1 = [];
-    $scope.objEmojiRaw2 = [];
-
-    for(i=1; i<=numberEmoji; i=i+2) {
-      $scope.objEmojiRaw1.push(i+'.svg');
-    }
-    for(i=2; i<=numberEmoji; i=i+2) {
-      $scope.objEmojiRaw2.push(i+'.svg');
-    }
-  };
   // event on the left swipe in the tabs
   $scope.onSwipeLeft = function () {
     var selected = $ionicTabsDelegate.selectedIndex();
@@ -80,54 +67,37 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
         $ionicTabsDelegate.select(selected - 1);
     }
   }
-  // set values when emoji is selected
-  $scope.validateEmoji = function(state, emoji) {
-    $scope.emojiIsValidate = true;
-    $scope.selectedEmoji = emoji;
-  }
   // validation when click on button send me now
   $scope.validateInvitation = function(e) {
-    // emoji set ?
-    if (typeof($scope.emojiIsValidate) !== 'undefined') {
-      // contact set ?
-      if ($scope.invitationToContact.length > 0) {
-         // envoi les Invitations
-         var user_id = JSON.parse(window.localStorage['user']).id_users;
-         var sender_phoneNumber = JSON.parse(window.localStorage['user']).phone_number;
-         $http.post(new Ionic.IO.Settings().get('serverUrl') + '/sendInvitation',
-         {
-           id : user_id,
-           invitationObject: $scope.invitationToContact,
-           position : JSON.parse(window.localStorage['invitationPosition']),
-           emoji: $scope.selectedEmoji,
-           sender_phoneNumber : sender_phoneNumber,
+    if ($scope.invitationToContact.length > 0) {
+       // envoi les Invitations
+       var user_id = JSON.parse(window.localStorage['user']).id_users;
+       var sender_phoneNumber = JSON.parse(window.localStorage['user']).phone_number;
+       $http.post(new Ionic.IO.Settings().get('serverUrl') + '/sendInvitation',
+       {
+         id : user_id,
+         invitationObject: $scope.invitationToContact,
+         position : JSON.parse(window.localStorage['invitationPosition']),
+         emoji: $('.imgInvitation').attr('src'),
+         sender_phoneNumber : sender_phoneNumber,
+       })
+       .then(function successCallback(data) {
+          //avec l'id de la nouvelle invitation, on fait rejoindre le sender dans la socket room de cet id
+          socket.emit('joinInvitationRoom', data.data.invitationId);
+          socket.emit('preventSenderInvited', data.data.tabUserId, data.data.invitationId, sender_phoneNumber);
+          $cordovaToast.showShortCenter('Invitation envoyée...');
+          $rootScope.modal.hide();
+       }
+       , function errorCallback(err) {
 
-         })
-         .then(function successCallback(data) {
-            //avec l'id de la nouvelle invitation, on fait rejoindre le sender dans la socket room de cet id
-            socket.emit('joinInvitationRoom', data.data.invitationId);
-            socket.emit('preventSenderInvited', data.data.tabUserId, data.data.invitationId, sender_phoneNumber);
-            $cordovaToast.showShortCenter('Invitation sended...');
-            $rootScope.modal.hide();
-         }
-         , function errorCallback(err) {
-
-         });
-      }
-      // contact no setted
-      else {
-        var alertPopupContacts = $ionicPopup.alert({
-            title: 'Oops!',
-            template: 'Who is coming for <img src="img/emoji/'+$scope.selectedEmoji + '"/> ?'
-        });
-      }
-    }
-    // emoji not setted
-    else {
-       var alertPopupEmoji = $ionicPopup.alert({
-           title: 'Warning!',
-           template: 'You have to set an emoji.'
        });
+    }
+    // contact no setted
+    else {
+      var alertPopupContacts = $ionicPopup.alert({
+          title: 'Oops!',
+          template: 'Qui est invité ?'
+      });
     }
   }
   // objetc which contains all contact for the invitation
@@ -227,7 +197,6 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
     $cordovaToast.showShortBottom = function(text) {
       console.log(text);
     }
-    $scope.renderEmoji();
     // fictif contact object
     var contacts = [
       {
@@ -276,7 +245,6 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
     if (!$rootScope.viewedInvitationView) {
       if ($rootScope.contacts) {
         $scope.contacts = $rootScope.contacts;
-        $scope.renderEmoji();
       }
       else {
         // loader
@@ -286,7 +254,6 @@ starter.controller('InvitationCtrl', function($scope, $rootScope, $state, $cordo
           });
           $scope.getAllContacts();
           $scope.renderGroups();
-          $scope.renderEmoji();
         }, 400);
       }
       $rootScope.viewedInvitationView = true;

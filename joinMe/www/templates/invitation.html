@@ -3,14 +3,17 @@
 <ion-modal-view ng-controller="InvitationCtrl" class="modalInvitation">
     <ion-content class="contentInvitation">
       <span class="titleActivity">Activité</span>
-      <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}; emojiIsSelected = false;">
+      <div class="containerImgInvitation">
+        <img src="" class="imgInvitation" alt="" />
+      </div>
+      <!-- <ion-scroll direction="x" class="emoji" ng-init="selection = {selectedNode: null}; emojiIsSelected = false;">
         <div class="row2">
           <img ng-repeat="emoji in objEmojiRaw1" class="eachEmoji" ng-class="{selectedIcon: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
         </div>
         <div class="row2">
           <img ng-repeat="emoji in objEmojiRaw2" class="eachEmoji" ng-class="{selectedIcon: selection.selectedNode === '{{emoji}}'}" ng-click="selection.selectedNode = '{{emoji}}'; emojiIsSelected = true; validateEmoji(emojiIsSelected, '{{emoji}}')" src="img/emoji/{{emoji}}" alt="" />
         </div>
-      </ion-scroll>
+      </ion-scroll> -->
 
       <ion-tabs class="tabs-positive tabs-icon-only" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
         <ion-tab icon="iconPersonTab" >
